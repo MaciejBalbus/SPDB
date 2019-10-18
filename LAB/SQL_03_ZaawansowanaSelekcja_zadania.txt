@@ -1,0 +1,141 @@
+--ZADANIE 01 SQL_03_ZaawansowanaSelekcja_zadania
+
+SELECT 
+	 pracownicy.nazwisko,
+	 CAST(pracownicy.etat AS CHAR(2)) || pracownicy.id_prac AS "KOD"
+FROM
+	pracownicy
+ORDER BY
+	pracownicy.ID_PRAC
+
+========================================================================================================
+--ZADANIE 02 SQL_03_ZaawansowanaSelekcja_zadania
+
+SELECT 
+	 pracownicy.nazwisko,
+	 TRANSLATE(pracownicy.nazwisko,'KLM','XXX') AS "WOJNA_LITEROM"
+FROM
+	pracownicy
+ORDER BY
+	pracownicy.ID_PRAC
+
+========================================================================================================
+--ZADANIE 03 SQL_03_ZaawansowanaSelekcja_zadania
+
+SELECT 
+	 pracownicy.nazwisko
+FROM
+	pracownicy
+WHERE
+	INSTR(pracownicy.nazwisko,'L',1,LENGTH(pracownicy.nazwisko)/2) =0		
+ORDER BY
+	pracownicy.ID_PRAC
+
+========================================================================================================
+--ZADANIE 04 SQL_03_ZaawansowanaSelekcja_zadania
+
+SELECT 
+	 pracownicy.nazwisko,
+	 ROUND(pracownicy.placa_pod*1.15,0) AS "PODWYZKA"
+FROM
+	pracownicy
+ORDER BY
+	pracownicy.ID_PRAC
+
+========================================================================================================
+--ZADANIE 05 SQL_03_ZaawansowanaSelekcja_zadania
+
+SELECT 
+	 pracownicy.nazwisko,
+	 REPLACE(TO_CHAR(pracownicy.placa_pod),'.',',') 	AS PLACA_POD,
+	 REPLACE(TO_CHAR(pracownicy.placa_pod*0.2),'.',',') AS "INWESTYCJA",
+	 REPLACE(TO_CHAR(ROUND((pracownicy.placa_pod*0.2)*POWER(1.1,10),6)),'.',',')	AS "KAPITAL",
+	 REPLACE(TO_CHAR(ROUND((pracownicy.placa_pod*0.2)*POWER(1.1,10),6)-(pracownicy.placa_pod*0.2)),'.',',')	AS "ZYSK"
+FROM
+	pracownicy
+WHERE
+	1=1 
+ORDER BY
+	pracownicy.ID_PRAC
+
+========================================================================================================
+--ZADANIE 06 SQL_03_ZaawansowanaSelekcja_zadania
+--jak kon pod gore
+SELECT 
+	 pracownicy.nazwisko,
+	 to_char(pracownicy.zatrudniony,'yy/mm/dd') AS "ZATRUDNI",
+	 REPLACE(SUBSTR(TO_CHAR((DATE'2000-01-01'-pracownicy.zatrudniony) YEAR TO MONTH),2,2),'0','') AS "STAZ_W_2000"
+FROM
+	pracownicy
+WHERE
+	1=1 
+ORDER BY
+	pracownicy.ID_PRAC
+
+========================================================================================================
+--ZADANIE 07 SQL_03_ZaawansowanaSelekcja_zadania
+
+SELECT 
+	pracownicy.nazwisko,
+	TO_CHAR(pracownicy.zatrudniony, 'month, dd yyyy')
+FROM
+	pracownicy
+WHERE
+	pracownicy.id_zesp=20
+ORDER BY
+	pracownicy.ID_PRAC
+
+========================================================================================================
+--ZADANIE 08 SQL_03_ZaawansowanaSelekcja_zadania
+
+SELECT 
+	TO_CHAR(CURRENT_DATE,'DAY') AS "DZIS"
+from
+	dual
+========================================================================================================
+--ZADANIE 09 SQL_03_ZaawansowanaSelekcja_zadania
+
+SELECT 
+	zespoly.nazwa,
+	zespoly.adres,
+	CASE zespoly.adres
+		WHEN 'MIELZYNSKIEGO 30' THEN 'STARE MIASTO'
+		WHEN 'STRZELECKA 14' THEN 'STARE MIASTO'
+		WHEN 'PIOTROWO 3A' THEN 'NOWE MIASTO'
+		WHEN 'WLODKOWICA 16' THEN 'GRUNWALD'
+	END AS "DZIELNICA"
+FROM
+	zespoly
+ORDER BY
+	zespoly.id_zesp
+========================================================================================================
+--ZADANIE 10 SQL_03_ZaawansowanaSelekcja_zadania
+
+SELECT 
+	pracownicy.nazwisko,
+	REPLACE(TO_CHAR(pracownicy.placa_pod),'.',',') AS "PLACA_POD",
+	CASE
+		WHEN pracownicy.placa_pod>480 THEN 'Powyżej 480'
+		WHEN pracownicy.placa_pod=480 THEN 'Dokładnie 480'
+		ELSE 'Poniżej 480'
+	END AS "PROG"
+FROM
+	pracownicy
+ORDER BY
+	pracownicy.placa_pod DESC
+========================================================================================================
+--ZADANIE 11 SQL_03_ZaawansowanaSelekcja_zadania
+
+SELECT 
+	pracownicy.nazwisko,
+	REPLACE(TO_CHAR(pracownicy.placa_pod),'.',',') AS "PLACA_POD",
+	DECODE(	SIGN(pracownicy.placa_pod-480),
+			1,'Powyżej 480',
+		    0,'Dokładnie 480',
+		   	-1,'Poniżej 480',
+		   	'NIE WIEM'
+		   ) AS "PROG"
+FROM
+	pracownicy
+ORDER BY
+	pracownicy.placa_pod DESC

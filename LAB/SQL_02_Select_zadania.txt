@@ -1,0 +1,200 @@
+--ZADANIE 01 SQL_02_Select_zadania
+
+SELECT 
+*
+FROM
+zespoly
+ORDER BY
+id_zesp;
+
+========================================================================================================
+--ZADANIE 02 SQL_02_Select_zadania
+
+SELECT 
+	pracownicy.id_prac,
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	COALESCE(TO_CHAR(pracownicy.id_szefa),' ') AS "ID_SZEFA" ,
+	TO_CHAR(pracownicy.zatrudniony,'dd-mm-yyyy') AS "ZATRUDNION",
+	REPLACE(TO_CHAR(pracownicy.placa_pod),'.',',') AS "PLACA_POD",
+	COALESCE(REPLACE(TO_CHAR(pracownicy.placa_dod),'.',','),' ') AS "PLACA_DOD",
+	pracownicy.id_zesp
+FROM
+	pracownicy
+ORDER BY
+	id_prac;
+
+========================================================================================================
+--ZADANIE 03 SQL_02_Select_zadania
+
+SELECT 
+	pracownicy.nazwisko,
+	REPLACE(TO_CHAR(pracownicy.placa_pod*12),'.',',') AS "PLACA_POD*12"
+FROM
+	pracownicy
+ORDER BY
+	pracownicy.id_prac;
+
+========================================================================================================
+--ZADANIE 04 SQL_02_Select_zadania
+
+SELECT 
+	pracownicy.etat,
+	REPLACE(TO_CHAR(pracownicy.placa_pod+COALESCE(pracownicy.placa_dod,0)),'.',',') AS "MIESIECZNE_ZAROBKI"
+FROM
+	pracownicy
+ORDER BY
+	pracownicy.id_prac
+
+========================================================================================================
+--ZADANIE 05 SQL_02_Select_zadania
+
+SELECT 
+	*
+FROM
+	zespoly
+ORDER BY
+	zespoly.nazwa
+
+========================================================================================================
+--ZADANIE 06 SQL_02_Select_zadania
+
+SELECT UNIQUE 			--DISTINCT
+	pracownicy.etat		--,pracownicy.nazwisko
+FROM
+	pracownicy
+
+========================================================================================================
+--ZADANIE 07 SQL_02_Select_zadania
+
+SELECT 
+	pracownicy.id_prac,
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	pracownicy.id_szefa,
+	TO_CHAR(pracownicy.zatrudniony,'DD-MM-YYYY') AS "ZATRUDNIONY",					--aby data byla ladniejsza
+	REPLACE(TO_CHAR(pracownicy.placa_pod),'.',',') AS "PLACA_POD",					--dorobienie przecinka zamiast kropki
+	REPLACE(COALESCE(TO_CHAR(pracownicy.placa_dod),' '),'.',',') AS "PLACA_DOD", 			--dorobienie przecinka zamiast kropki i spacji zamiast null
+	pracownicy.id_zesp
+FROM
+	pracownicy
+WHERE
+	pracownicy.etat='ASYSTENT'
+ORDER BY
+	pracownicy.id_prac
+
+========================================================================================================
+--ZADANIE 08 SQL_02_Select_zadania
+
+SELECT 
+	pracownicy.id_prac,
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	pracownicy.placa_pod,
+	pracownicy.id_zesp
+FROM
+	pracownicy
+WHERE
+	pracownicy.id_zesp=30 OR pracownicy.id_zesp=40
+ORDER BY
+	pracownicy.placa_pod desc
+
+========================================================================================================
+--ZADANIE 09 SQL_02_Select_zadania
+
+SELECT 
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	REPLACE(TO_CHAR(pracownicy.placa_pod),'.',',') AS "PLACA_POD",
+	pracownicy.id_zesp
+FROM
+	pracownicy
+WHERE
+	pracownicy.placa_pod BETWEEN 300 AND 800
+ORDER BY
+	pracownicy.id_prac 
+
+========================================================================================================
+--ZADANIE 10 SQL_02_Select_zadania
+
+SELECT 
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	pracownicy.id_zesp
+FROM
+	pracownicy
+WHERE
+	pracownicy.nazwisko LIKE '%SKI'
+ORDER BY
+	pracownicy.id_prac 
+
+========================================================================================================
+--ZADANIE 11 SQL_02_Select_zadania
+
+SELECT 
+	pracownicy.id_prac,
+	pracownicy.id_szefa,
+	pracownicy.nazwisko,
+	pracownicy.placa_pod
+FROM
+	pracownicy
+WHERE
+	pracownicy.placa_pod >1000 AND pracownicy.id_szefa IS NOT NULL
+ORDER BY
+	pracownicy.id_prac 
+
+========================================================================================================
+--ZADANIE 12 SQL_02_Select_zadania
+
+SELECT 
+	pracownicy.nazwisko,
+	pracownicy.id_zesp
+FROM
+	pracownicy
+WHERE
+	pracownicy.id_zesp = 20 AND (pracownicy.nazwisko LIKE 'M%' OR pracownicy.nazwisko LIKE '%SKI')
+ORDER BY
+	pracownicy.id_prac 
+
+========================================================================================================
+--ZADANIE 13 SQL_02_Select_zadania
+
+SELECT 
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	REPLACE(TO_CHAR((pracownicy.placa_pod)/(20*8)),'.',',') AS "STAWKA"
+FROM
+	pracownicy
+WHERE
+	(pracownicy.etat != 'ADIUNKT' AND pracownicy.etat != 'ASYSTENT' AND pracownicy.etat != 'STAZYSTA')
+	AND
+	pracownicy.placa_pod NOT BETWEEN 400 AND 800
+ORDER BY
+	pracownicy.placa_pod 
+
+========================================================================================================
+--ZADANIE 14 SQL_02_Select_zadania
+
+SELECT 
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	pracownicy.placa_pod,
+	COALESCE(REPLACE(TO_CHAR(pracownicy.placa_dod),'.',','),' ') AS "PLACA_DOD"
+FROM
+	pracownicy
+WHERE
+	placa_pod + COALESCE(placa_dod,0) >1000
+ORDER BY
+	pracownicy.etat, pracownicy.nazwisko
+
+========================================================================================================
+--ZADANIE 15 SQL_02_Select_zadania
+
+SELECT 
+	 pracownicy.nazwisko || ' PRACUJE OD '|| TO_CHAR(pracownicy.zatrudniony,'dd-mm-yyyy') ||' I ZARABIA '|| pracownicy.placa_pod AS "PROFESOROWIE"
+FROM
+	pracownicy
+WHERE
+	pracownicy.etat='PROFESOR'
+ORDER BY
+	pracownicy.placa_pod desc
