@@ -1,0 +1,128 @@
+--ZADANIE 01 SQL_04_FunkcjeGrupowe
+SELECT
+	MIN(pracownicy.placa_pod) AS "MINIMUM", 
+	MAX(pracownicy.placa_pod) AS "MAKSIMUM",
+	MAX(pracownicy.placa_pod)-MIN(pracownicy.placa_pod)AS "RÓŻNICA"
+FROM
+	pracownicy
+
+========================================================================================================
+--ZADANIE 02 SQL_04_FunkcjeGrupowe
+SELECT
+	pracownicy.etat AS "ETAT",
+	AVG(pracownicy.placa_pod) AS "SREDNIA"
+FROM
+	pracownicy
+WHERE
+	1=1
+GROUP BY
+	pracownicy.etat
+ORDER BY
+	AVG(pracownicy.placa_pod) DESC
+
+========================================================================================================
+--ZADANIE 03 SQL_04_FunkcjeGrupowe
+SELECT
+	COUNT(pracownicy.etat) AS "PROFESOROWIE"
+FROM
+	pracownicy
+WHERE
+	pracownicy.etat = 'PROFESOR'
+GROUP BY
+	pracownicy.etat
+
+========================================================================================================
+--ZADANIE 04 SQL_04_FunkcjeGrupowe
+SELECT
+	pracownicy.id_zesp,
+	SUM(pracownicy.placa_pod)+SUM(pracownicy.placa_dod) AS "SUMARYCZNE_PLACE"
+FROM
+	pracownicy
+GROUP BY
+	pracownicy.id_zesp
+ORDER BY
+	pracownicy.id_zesp
+
+========================================================================================================
+--ZADANIE 05 SQL_04_FunkcjeGrupowe
+SELECT
+    MAX(SUM(pracownicy.placa_pod)+SUM(pracownicy.placa_dod)) AS "SUMARYCZNE_PLACE"
+FROM
+	pracownicy
+GROUP BY
+	pracownicy.id_zesp
+
+========================================================================================================
+--ZADANIE 06 SQL_04_FunkcjeGrupowe
+SELECT
+    pracownicy.id_szefa,
+	MIN(pracownicy.placa_pod) AS"MINIMALNA"
+FROM
+	pracownicy
+WHERE
+	pracownicy.id_szefa IS NOT NULL	
+GROUP BY
+	pracownicy.id_szefa
+ORDER BY
+	MIN(pracownicy.placa_pod) DESC
+
+========================================================================================================
+--ZADANIE 07 SQL_04_FunkcjeGrupowe
+SELECT
+   pracownicy.id_zesp,
+   COUNT(pracownicy.id_zesp) AS "ILU_PRACUJE"
+FROM
+	pracownicy
+WHERE
+	1=1
+GROUP BY
+	pracownicy.id_zesp
+ORDER BY
+	COUNT(pracownicy.id_zesp) DESC
+
+========================================================================================================
+--ZADANIE 08 SQL_04_FunkcjeGrupowe
+SELECT
+   pracownicy.id_zesp,
+   COUNT(pracownicy.id_zesp) AS "ILU_PRACUJE"
+FROM
+	pracownicy
+WHERE
+	1=1
+GROUP BY
+	pracownicy.id_zesp
+HAVING
+	COUNT(pracownicy.id_zesp)>3	
+ORDER BY
+	COUNT(pracownicy.id_zesp) DESC
+
+========================================================================================================
+--ZADANIE 09 SQL_04_FunkcjeGrupowe
+SELECT
+   pracownicy.id_prac
+FROM
+	pracownicy
+WHERE
+	1=1
+GROUP BY
+	pracownicy.id_prac
+HAVING
+	COUNT(pracownicy.id_prac)>1
+
+========================================================================================================
+--ZADANIE 10 SQL_04_FunkcjeGrupowe
+SELECT
+   pracownicy.etat,
+   AVG(pracownicy.placa_pod) AS "ŚREDNIA",
+   COUNT(pracownicy.nazwisko) AS "LICZBA"
+FROM
+	pracownicy
+WHERE
+	pracownicy.zatrudniony < DATE '1990-01-01'
+GROUP BY
+	pracownicy.etat
+ORDER BY
+	 pracownicy.etat
+
+========================================================================================================
+
