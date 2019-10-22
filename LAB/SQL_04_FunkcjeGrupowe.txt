@@ -125,4 +125,73 @@ ORDER BY
 	 pracownicy.etat
 
 ========================================================================================================
+--ZADANIE 11 SQL_04_FunkcjeGrupowe
+SELECT
+	pracownicy.id_zesp,
+	pracownicy.etat,
+	ROUND(AVG(pracownicy.placa_pod +COALESCE(pracownicy.placa_DOD,0)),0) AS "SREDNIA",
+	ROUND(MAX(pracownicy.placa_pod +COALESCE(pracownicy.placa_DOD,0)),0) AS "MAKSYMALNA"		  
+FROM
+	pracownicy
+WHERE
+	pracownicy.etat in ('ASYSTENT', 'PROFESOR')
+GROUP BY
+	pracownicy.id_zesp,pracownicy.etat
+ORDER BY
+	pracownicy.id_zesp,	pracownicy.etat	  
+
+========================================================================================================
+--ZADANIE 12 SQL_04_FunkcjeGrupowe
+SELECT
+	EXTRACT(YEAR FROM pracownicy.zatrudniony) AS "ROK",
+	COUNT(pracownicy.id_prac) AS "ILU_PRACOWNIKOW"
+FROM
+	pracownicy
+WHERE
+	1=1
+GROUP BY
+	EXTRACT(YEAR FROM pracownicy.zatrudniony)
+ORDER BY
+	EXTRACT(YEAR FROM pracownicy.zatrudniony)
+
+========================================================================================================
+--ZADANIE 13 SQL_04_FunkcjeGrupowe
+SELECT
+	LENGTH(pracownicy.nazwisko) AS "Ile liter",
+	COUNT(pracownicy.nazwisko)	AS "W ilu nazwiskach"
+FROM
+	pracownicy
+WHERE
+	1=1
+GROUP BY
+	LENGTH(pracownicy.nazwisko)
+ORDER BY
+	LENGTH(pracownicy.nazwisko)
+
+========================================================================================================
+--ZADANIE 14 SQL_04_FunkcjeGrupowe
+SELECT
+	COUNT(pracownicy.nazwisko) AS "Ile nazwisk z A"
+FROM
+	pracownicy
+WHERE
+	INSTR(UPPER(pracownicy.nazwisko),'A',1,1)>1
+
+========================================================================================================
+--ZADANIE 15 SQL_04_FunkcjeGrupowe
+SELECT
+	
+	 SUM(CASE
+		  WHEN INSTR(UPPER(pracownicy.nazwisko),'A',1,1)>1 THEN 1
+		  ELSE 0
+	  END) AS "Ile nazwisk z A",
+	
+	
+	SUM( CASE
+		  WHEN INSTR(UPPER(pracownicy.nazwisko),'E',1,1)>1 THEN 1
+		  ELSE 0
+	  END) AS "Ile nazwisk z E"
+FROM
+	pracownicy	
+
 
