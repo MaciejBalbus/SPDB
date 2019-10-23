@@ -1,0 +1,90 @@
+--ZADANIE 01 SQL_05a_PolaczeniaPodstawy_zadania
+SELECT
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	pracownicy.id_zesp,
+	zespoly.nazwa
+FROM
+	pracownicy INNER JOIN zespoly ON  pracownicy.id_zesp = zespoly.id_zesp
+ORDER BY
+	pracownicy.nazwisko
+
+========================================================================================================
+--ZADANIE 02 SQL_05a_PolaczeniaPodstawy_zadania
+SELECT
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	pracownicy.id_zesp,
+	zespoly.nazwa
+FROM
+	pracownicy INNER JOIN zespoly ON  pracownicy.id_zesp = zespoly.id_zesp
+WHERE
+	zespoly.adres='PIOTROWO 3A'	
+ORDER BY
+	pracownicy.nazwisko
+
+========================================================================================================
+--ZADANIE 03 SQL_05a_PolaczeniaPodstawy_zadania
+SELECT
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	pracownicy.placa_pod,
+	etaty.placa_min,
+	etaty.placa_max
+FROM
+	pracownicy INNER JOIN etaty ON  pracownicy.etat = etaty.nazwa
+WHERE
+	1=1
+ORDER BY
+	pracownicy.etat,pracownicy.nazwisko
+
+========================================================================================================
+--ZADANIE 04 SQL_05a_PolaczeniaPodstawy_zadania
+SELECT
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	pracownicy.placa_pod,
+	etaty.placa_min,
+	etaty.placa_max,
+	CASE
+		WHEN pracownicy.placa_pod BETWEEN etaty.placa_min AND etaty.placa_max THEN 'OK'
+		ELSE 'NIE OK'
+	END AS "CZY_PENSJA_OK" 
+FROM
+	pracownicy INNER JOIN etaty ON  pracownicy.etat = etaty.nazwa
+WHERE
+	1=1
+ORDER BY
+	pracownicy.etat,pracownicy.nazwisko
+
+========================================================================================================
+--ZADANIE 05 SQL_05a_PolaczeniaPodstawy_zadania
+SELECT
+	pracownicy.nazwisko,
+	pracownicy.etat,
+	pracownicy.placa_pod,
+	etaty.placa_min,
+	etaty.placa_max,
+	CASE
+		WHEN pracownicy.placa_pod BETWEEN etaty.placa_min AND etaty.placa_max THEN 'OK'
+		ELSE 'NIE OK'
+	END AS "CZY_PENSJA_OK" 
+FROM
+	pracownicy INNER JOIN etaty ON  pracownicy.etat = etaty.nazwa
+WHERE
+	pracownicy.placa_pod NOT BETWEEN etaty.placa_min AND etaty.placa_max
+ORDER BY
+	pracownicy.etat,pracownicy.nazwisko
+
+
+
+
+
+
+
+
+
+
+
+
+

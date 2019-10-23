@@ -192,6 +192,23 @@ SELECT
 		  ELSE 0
 	  END) AS "Ile nazwisk z E"
 FROM
-	pracownicy	
+	pracownicy
+
+========================================================================================================
+--ZADANIE 16 SQL_04_FunkcjeGrupowe
+SELECT
+	pracownicy.id_zesp,
+	SUM(pracownicy.placa_pod) AS "SUMA_PLAC",
+	LISTAGG(pracownicy.nazwisko||':'||pracownicy.placa_pod,'*') --nie wiedzieć czemu ale średnik przez http nie chce ablać wstawiono gwiazdke
+	WITHIN GROUP (ORDER BY nazwisko) AS "PRACOWNICY"
+FROM
+	pracownicy
+WHERE
+	1=1
+GROUP BY
+	pracownicy.id_zesp
+ORDER BY
+	pracownicy.id_zesp
+
 
 
