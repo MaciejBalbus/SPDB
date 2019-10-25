@@ -76,6 +76,56 @@ WHERE
 ORDER BY
 	pracownicy.etat,pracownicy.nazwisko
 
+========================================================================================================
+--ZADANIE 06 SQL_05a_PolaczeniaPodstawy_zadania
+SELECT
+	pracownicy.nazwisko,
+	pracownicy.placa_pod,
+	pracownicy.etat,
+	etaty.nazwa AS KAT_PLAC,
+	etaty.placa_min AS PLACA_MIN,
+	etaty.placa_max AS PLACA_MAX
+	
+FROM
+	pracownicy INNER JOIN etaty ON  pracownicy.placa_pod  BETWEEN etaty.placa_min AND etaty.placa_max
+WHERE
+	1=1
+ORDER BY
+	pracownicy.nazwisko
+
+========================================================================================================
+--ZADANIE 07 SQL_05a_PolaczeniaPodstawy_zadania
+SELECT
+	pracownicy.nazwisko,
+	pracownicy.placa_pod,
+	pracownicy.etat,
+	etaty.nazwa AS KAT_PLAC,
+	etaty.placa_min AS PLACA_MIN,
+	etaty.placa_max AS PLACA_MAX
+FROM
+	pracownicy INNER JOIN etaty ON  pracownicy.placa_pod  BETWEEN etaty.placa_min AND etaty.placa_max
+WHERE
+	etaty.nazwa ='SEKRETARKA'
+ORDER BY
+	pracownicy.nazwisko
+
+========================================================================================================
+--ZADANIE 08 SQL_05a_PolaczeniaPodstawy_zadania
+SELECT
+	prac.nazwisko,
+	prac.id_prac,
+	szef.nazwisko AS SZEF,
+	szef.id_prac AS ID_SZEFA
+FROM
+	pracownicy prac INNER JOIN pracownicy szef ON  prac.id_szefa = szef.id_prac
+WHERE
+	1=1
+ORDER BY
+	prac.nazwisko	
+
+========================================================================================================
+
+
 
 
 
