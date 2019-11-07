@@ -124,9 +124,52 @@ ORDER BY
 	prac.nazwisko	
 
 ========================================================================================================
+--Kolejne zadania testowane w Oracle SQL Developer
+--ZADANIE 09 SQL_05a_PolaczeniaPodstawy_zadania
+--W zadaniu w wynikach pdf z czwiczeń występuje dwa razy kolumna "ZATRUDNIONY" nie udalo się osignac takiego 
+--efektu; wsumnie to chyba awykonalne z punku widzenia SQL
+SELECT
+	prac.nazwisko,
+	prac.zatrudniony,
+	szef.nazwisko AS SZEF,
+	szef.zatrudniony,
+    EXTRACT(YEAR FROM((prac.zatrudniony-szef.zatrudniony) YEAR TO MONTH)) AS "LATA"
+FROM
+	pracownicy prac INNER JOIN pracownicy szef ON  prac.id_szefa = szef.id_prac
+WHERE
+	(prac.zatrudniony-szef.zatrudniony) YEAR TO MONTH  < INTERVAL '10' YEAR 
+ORDER BY
+	prac.zatrudniony,prac.zatrudniony
+========================================================================================================
+--ZADANIE 10 SQL_05a_PolaczeniaPodstawy_zadania
 
+SELECT
+    zespoly.nazwa,
+    count(pracownicy.id_prac) AS "LICZBA",
+    AVG(pracownicy.placa_pod) AS SREDNIA_PLACA
+FROM
+	zespoly INNER JOIN pracownicy ON zespoly.id_zesp=pracownicy.id_zesp
+GROUP BY 
+    zespoly.nazwa
+ORDER BY
+    zespoly.nazwa
+========================================================================================================
+--ZADANIE 11 SQL_05a_PolaczeniaPodstawy_zadania
 
-
+SELECT
+    zespoly.nazwa,
+    CASE 
+        WHEN count(pracownicy.id_prac) <=2 THEN 'mały' 
+        WHEN count(pracownicy.id_prac) >=7 THEN 'duży'
+        ELSE 'średni'
+    END AS "ETYKIETA"
+FROM
+	zespoly INNER JOIN pracownicy ON zespoly.id_zesp=pracownicy.id_zesp
+GROUP BY 
+    zespoly.nazwa
+ORDER BY
+    zespoly.nazwa
+========================================================================================================
 
 
 
