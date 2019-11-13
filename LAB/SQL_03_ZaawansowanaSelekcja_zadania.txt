@@ -27,7 +27,7 @@ SELECT
 FROM
 	pracownicy
 WHERE
-	INSTR(pracownicy.nazwisko,'L',1,LENGTH(pracownicy.nazwisko)/2) =0		
+	INSTR(SUBSTR(pracownicy.nazwisko,1,LENGTH(pracownicy.nazwisko)/2),'L',1,1) !=0		
 ORDER BY
 	pracownicy.ID_PRAC
 
