@@ -175,20 +175,20 @@ SELECT
 FROM
 	pracownicy
 WHERE
-	INSTR(UPPER(pracownicy.nazwisko),'A',1,1)>1
+	INSTR(UPPER(pracownicy.nazwisko),'A',1,1)>0
 
 ========================================================================================================
 --ZADANIE 15 SQL_04_FunkcjeGrupowe
 SELECT
 	
 	 SUM(CASE
-		  WHEN INSTR(UPPER(pracownicy.nazwisko),'A',1,1)>1 THEN 1
+		  WHEN INSTR(UPPER(pracownicy.nazwisko),'A',1,1)>0 THEN 1
 		  ELSE 0
 	  END) AS "Ile nazwisk z A",
 	
 	
 	SUM( CASE
-		  WHEN INSTR(UPPER(pracownicy.nazwisko),'E',1,1)>1 THEN 1
+		  WHEN INSTR(UPPER(pracownicy.nazwisko),'E',1,1)>0 THEN 1
 		  ELSE 0
 	  END) AS "Ile nazwisk z E"
 FROM

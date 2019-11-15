@@ -60,18 +60,14 @@ ORDER BY
 
 ========================================================================================================
 --ZADANIE 06 SQL_03_ZaawansowanaSelekcja_zadania
---jak kon pod gore
 SELECT 
 	 pracownicy.nazwisko,
 	 to_char(pracownicy.zatrudniony,'yy/mm/dd') AS "ZATRUDNI",
-	 REPLACE(SUBSTR(TO_CHAR((DATE'2000-01-01'-pracownicy.zatrudniony) YEAR TO MONTH),2,2),'0','') AS "STAZ_W_2000"
+     EXTRACT(YEAR FROM (DATE'2000-01-01' - pracownicy.zatrudniony) YEAR TO MONTH)
 FROM
 	pracownicy
-WHERE
-	1=1 
 ORDER BY
 	pracownicy.ID_PRAC
-
 ========================================================================================================
 --ZADANIE 07 SQL_03_ZaawansowanaSelekcja_zadania
 

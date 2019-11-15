@@ -1,0 +1,101 @@
+--ZADANIE 01 SQL_05b_PolaczeniaZaawansowane_zadania
+
+--INSERT INTO pracownicy(id_prac, nazwisko)    dodanie pracownika który będzie potrzebny w zadaniach 1-3
+--VALUES ((SELECT max(id_prac) + 1 FROM pracownicy), 'WOLNY');
+
+SELECT 
+    p.nazwisko,
+    p.id_zesp,
+    z.nazwa
+FROM
+    pracownicy p LEFT JOIN zespoly z ON p.id_zesp = z.id_zesp 
+ORDER BY
+    p.nazwisko ASC
+
+========================================================================================================
+--ZADANIE 02 SQL_05b_PolaczeniaZaawansowane_zadania
+SELECT 
+    z.nazwa,
+    z.id_zesp,
+    coalesce(p.nazwisko,'brak pracowników')
+FROM
+    zespoly z LEFT JOIN pracownicy p ON z.id_zesp = p.id_zesp
+ORDER BY
+    z.nazwa,p.nazwisko
+
+========================================================================================================
+--ZADANIE 03 SQL_05b_PolaczeniaZaawansowane_zadania
+SELECT 
+    coalesce(z.nazwa,'brak zespolu'),
+    coalesce(p.nazwisko,'brak pracowników')
+FROM
+    zespoly z FULL JOIN pracownicy p ON z.id_zesp = p.id_zesp
+ORDER BY
+    z.nazwa,p.nazwisko
+
+--DELETE FROM pracownicy  pamiętać o usunięciu dodanego pracownika
+--WHERE nazwisko = 'WOLNY'; 
+
+========================================================================================================
+--ZADANIE 04 SQL_05b_PolaczeniaZaawansowane_zadania
+SELECT
+    z.nazwa,
+    COUNT(p.id_prac) AS liczba,
+    coalesce(SUM(p.placa_pod),0) AS suma_plac
+FROM
+    zespoly z LEFT JOIN pracownicy p ON z.id_zesp =p.id_zesp
+GROUP BY
+    z.nazwa
+ORDER BY
+    z.nazwa ASC 
+
+========================================================================================================
+--ZADANIE 05 SQL_05b_PolaczeniaZaawansowane_zadania
+SELECT
+    z.nazwa
+FROM
+    zespoly z LEFT JOIN pracownicy p ON z.id_zesp =p.id_zesp
+WHERE
+    p.id_prac IS NULL
+ORDER BY
+    z.nazwa ASC
+
+========================================================================================================
+--ZADANIE 06 SQL_05b_PolaczeniaZaawansowane_zadania
+SELECT
+     p.nazwisko AS pracownik,
+     p.id_prac  AS id_prac,
+     s.nazwisko AS szef,
+     s.id_prac  AS id_szefa   
+FROM
+    pracownicy p LEFT JOIN pracownicy s ON p.id_szefa=s.id_prac
+ORDER BY
+    p.nazwisko
+
+========================================================================================================
+--ZADANIE 07 SQL_05b_PolaczeniaZaawansowane_zadania
+SELECT
+    p.nazwisko          AS pracownik,
+    COUNT(pod.id_prac)  AS liczba_podwladnych  
+FROM
+    pracownicy p LEFT JOIN pracownicy pod ON p.id_prac=pod.id_szefa
+GROUP BY
+    p.nazwisko
+ORDER BY
+    p.nazwisko ASC;
+
+========================================================================================================
+--ZADANIE 08 SQL_05b_PolaczeniaZaawansowane_zadania
+SELECT
+    p.nazwisko,
+    p.etat,
+    p.placa_pod,
+    z.nazwa         AS nazwa
+FROM
+    pracownicy p LEFT JOIN zespoly z ON p.id_zesp = z.id_zesp 
+ORDER BY
+    nazwisko    
+CDN ....................................
+
+
+
