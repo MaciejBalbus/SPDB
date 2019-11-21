@@ -1,0 +1,112 @@
+--ZADANIE 01 SQL_06b_PodzapytaniaZaawansowane
+SELECT
+    zesp.id_zesp,
+    zesp.nazwa,
+    zesp.adres
+FROM
+    zespoly zesp
+WHERE
+    NOT EXISTS( SELECT  pracownicy.id_prac
+                FROM    pracownicy
+                WHERE   pracownicy.id_zesp = zesp.id_zesp)
+
+========================================================================================================
+--ZADANIE 02a SQL_06b_PodzapytaniaZaawansowane
+--Podzapytanie skorelowane - (Z KORELACJA)
+SELECT
+    prac.nazwisko,
+    prac.placa_pod,
+    prac.etat    
+FROM
+    pracownicy prac
+WHERE
+    prac.placa_pod > (  SELECT  AVG(placa_pod)
+                        FROM    pracownicy
+                        WHERE   pracownicy.etat=prac.etat)
+ORDER BY
+     prac.placa_pod DESC  
+
+========================================================================================================
+--ZADANIE 02b SQL_06b_PodzapytaniaZaawansowane
+--Podzapytanie zwykle - (BEZ KORELACJA)
+SELECT
+    prac.nazwisko,
+    prac.placa_pod,
+    prac.etat    
+FROM
+    pracownicy prac INNER JOIN ( SELECT etat,AVG(placa_pod) AS "SREDNIA"
+                                 FROM    pracownicy 
+                                 GROUP BY  etat) zapyt
+                    ON  prac.etat= zapyt.etat   
+WHERE
+    prac.placa_pod > zapyt.srednia
+ORDER BY
+     prac.placa_pod DESC  
+
+========================================================================================================
+--ZADANIE 03 SQL_06b_PodzapytaniaZaawansowane
+SELECT
+    prac.nazwisko,
+    prac.placa_pod
+FROM
+    pracownicy prac 
+WHERE
+    prac.placa_pod >=(  SELECT 0.75*zapyt.placa_pod
+                        FROM   pracownicy zapyt
+                        WHERE zapyt.id_prac=prac.id_szefa)                   
+ORDER BY
+     prac.placa_pod DESC
+
+========================================================================================================
+--ZADANIE 04 SQL_06b_PodzapytaniaZaawansowane
+SELECT
+    prac.nazwisko
+FROM
+    pracownicy prac 
+WHERE
+    prac.etat='PROFESOR'
+    AND
+    NOT EXISTS ( SELECT 1
+                 FROM pracownicy zapyt
+                 WHERE zapyt.id_szefa = prac.id_prac AND zapyt.etat IN ('STAZYSTA'))
+ORDER BY
+     prac.nazwisko ASC    
+
+========================================================================================================
+--ZADANIE 05 SQL_06b_PodzapytaniaZaawansowane
+SELECT
+    nazwa,MAKS_SUMA_PLAC
+FROM
+        (SELECT MAX(SUM(placa_pod))AS"MAKS_SUMA_PLAC" 
+                FROM pracownicy 
+                GROUP BY pracownicy.id_zesp)
+    INNER JOIN
+        (SELECT prac.id_zesp, SUM(placa_pod)AS"MAKS_SUMA_PLAC" 
+         FROM pracownicy prac 
+         GROUP BY prac.id_zesp)     USING ( MAKS_SUMA_PLAC)
+    INNER JOIN
+        (SELECT zesp.nazwa,zesp.id_zesp 
+         FROM zespoly zesp)         USING (id_zesp)
+
+========================================================================================================
+--ZADANIE 06a SQL_06b_PodzapytaniaZaawansowane
+--SPOSÓB 1
+SELECT 
+    prac.nazwisko,
+    prac.placa_pod
+FROM
+    pracownicy prac
+WHERE
+    (SELECT COUNT(*)
+     FROM pracownicy
+     WHERE placa_pod>prac.placa_pod)<=2
+ORDER BY
+    prac.placa_pod
+
+cdn...
+        
+
+
+
+
+
