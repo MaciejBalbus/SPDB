@@ -1,0 +1,168 @@
+--ZADANIE 01 SQL_06a_PodzapytaniaPodstawy_zadania
+ 
+ SELECT
+    prac.nazwisko,
+    prac.etat,
+    prac.id_zesp
+FROM 
+    pracownicy prac
+WHERE
+    id_zesp = ( SELECT  id_zesp
+                FROM    pracownicy
+                WHERE   nazwisko = 'BRZEZINSKI')
+ORDER BY
+    prac.nazwisko;    
+
+========================================================================================================
+--ZADANIE 02 SQL_06a_PodzapytaniaPodstawy_zadania
+ SELECT
+    prac.nazwisko,
+    prac.etat,
+    (   SELECT  zesp.nazwa
+        FROM    zespoly zesp
+        WHERE   zesp.id_zesp =( SELECT  id_zesp
+                                FROM    pracownicy
+                                WHERE   nazwisko = 'BRZEZINSKI')) AS "NAZWA"
+FROM 
+    pracownicy prac
+WHERE
+    id_zesp = ( SELECT  id_zesp
+                FROM    pracownicy
+                WHERE   nazwisko = 'BRZEZINSKI')
+ORDER BY
+    prac.nazwisko; 
+
+========================================================================================================
+--ZADANIE 03 SQL_06a_PodzapytaniaPodstawy_zadania
+SELECT
+    prac.nazwisko,
+    prac.etat,
+    TO_CHAR(prac.zatrudniony,'YYYY/MM/DD')  AS "ZATRUDNIONY" 
+FROM
+    pracownicy prac
+WHERE
+     (prac.etat,prac.zatrudniony) =(  SELECT  etat,MIN(zatrudniony)
+                                    FROM    pracownicy
+                                    GROUP BY etat 
+                                    HAVING   etat= 'PROFESOR')
+
+========================================================================================================
+--ZADANIE 04 SQL_06a_PodzapytaniaPodstawy_zadania
+SELECT
+    prac.nazwisko,
+    TO_CHAR(prac.zatrudniony,'YYYY/MM/DD')  AS "ZATRUDNIONY",
+    prac.id_zesp     
+FROM
+    pracownicy prac
+WHERE
+     (prac.id_zesp,prac.zatrudniony)IN( SELECT  id_zesp,MAX(zatrudniony)
+                                        FROM    pracownicy
+                                        GROUP BY id_zesp)
+ORDER BY
+    prac.zatrudniony;   
+
+========================================================================================================
+--ZADANIE 05 SQL_06a_PodzapytaniaPodstawy_zadania
+SELECT
+    zesp.id_zesp,
+    zesp.nazwa,
+    zesp.adres
+FROM
+    zespoly zesp
+WHERE
+    zesp.id_zesp NOT IN(    SELECT  id_zesp
+                            FROM    pracownicy
+                            GROUP BY id_zesp)
+
+========================================================================================================
+--ZADANIE 06 SQL_06a_PodzapytaniaPodstawy_zadania
+SELECT
+    prac.nazwisko
+FROM
+    pracownicy prac
+WHERE
+    prac.etat ='PROFESOR'
+    AND
+    prac.id_prac NOT IN(    SELECT  id_szefa
+                            FROM    pracownicy
+                            WHERE   etat = 'STAZYSTA') 
+
+========================================================================================================
+--ZADANIE 07 SQL_06a_PodzapytaniaPodstawy_zadania
+SELECT
+    prac.id_zesp,SUM(prac.placa_pod)
+FROM
+    pracownicy prac
+GROUP BY
+    prac.id_zesp
+HAVING
+    SUM(prac.placa_pod)=(   SELECT  MAX(SUM(placa_pod))
+                            FROM    pracownicy
+                            GROUP BY id_zesp)
+
+========================================================================================================
+--ZADANIE 08 SQL_06a_PodzapytaniaPodstawy_zadania
+SELECT
+    zesp.nazwa,SUM(prac.placa_pod)
+FROM
+    pracownicy prac INNER JOIN zespoly zesp ON prac.id_zesp = zesp.id_zesp 
+GROUP BY
+    zesp.nazwa
+HAVING
+    SUM(prac.placa_pod)=(   SELECT  MAX(SUM(placa_pod))
+                            FROM    pracownicy
+                            GROUP BY id_zesp)
+
+========================================================================================================
+--ZADANIE 09 SQL_06a_PodzapytaniaPodstawy_zadania
+SELECT
+    zesp.nazwa
+FROM
+    pracownicy prac INNER JOIN zespoly zesp     ON prac.id_zesp= zesp.id_zesp
+GROUP BY
+    zesp.nazwa
+HAVING
+    count(prac.id_prac) > ( SELECT  count(pracownicy.id_prac) 
+                            FROM    pracownicy INNER JOIN zespoly ON pracownicy.id_zesp= zespoly.id_zesp
+                            WHERE   zespoly.nazwa='ADMINISTRACJA')
+ORDER BY
+    zesp.nazwa
+
+========================================================================================================
+--ZADANIE 10 SQL_06a_PodzapytaniaPodstawy_zadania
+SELECT
+    prac.etat
+FROM
+    pracownicy prac
+GROUP BY
+    prac.etat
+HAVING
+    COUNT(prac.etat) =( SELECT  MAX(COUNT(pracownicy.id_prac))
+                        FROM    pracownicy
+                        GROUP BY pracownicy.etat)
+
+========================================================================================================
+--ZADANIE 11 SQL_06a_PodzapytaniaPodstawy_zadania
+SELECT
+    prac.etat,
+    LISTAGG (prac.nazwisko,',')
+    WITHIN GROUP(ORDER BY prac.nazwisko) AS "PRACOWNICY"
+FROM
+    pracownicy prac
+GROUP BY
+    prac.etat
+HAVING
+    COUNT(prac.etat) =( SELECT  MAX(COUNT(pracownicy.id_prac))
+                        FROM    pracownicy
+                        GROUP BY pracownicy.etat)
+
+========================================================================================================
+--ZADANIE 12 SQL_06a_PodzapytaniaPodstawy_zadania
+SELECT
+    prac.nazwisko AS "PRACOWNIK",
+    szef.nazwisko AS "SZEF"
+FROM
+    pracownicy prac INNER JOIN pracownicy szef ON prac.id_szefa = szef.id_prac
+WHERE
+    ABS(prac.placa_pod-szef.placa_pod) = (  SELECT MIN(ABS(prac.placa_pod-szef.placa_pod))      --stosujemy abs-y bo treść zadania zapisana trochę niematematycznie.
+                                            FROM pracownicy prac INNER JOIN pracownicy szef ON prac.id_szefa = szef.id_prac )
