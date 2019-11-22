@@ -103,9 +103,71 @@ WHERE
 ORDER BY
     prac.placa_pod
 
-cdn...
-        
+========================================================================================================
+--ZADANIE 06B SQL_06b_PodzapytaniaZaawansowane
+--SPOSÓB 2
+SELECT 
+    p.nazwisko,
+    AVG(p.placa_pod) AS"PLACA_POD"
+FROM
+    pracownicy p LEFT JOIN pracownicy b ON (p.placa_pod<b.placa_pod)
+GROUP BY
+    p.id_prac,p.nazwisko
+HAVING
+    COUNT(b.id_prac)<=2
+ORDER BY
+    AVG(p.placa_pod) DESC
 
+========================================================================================================
+--ZADANIE 7 SQL_06b_PodzapytaniaZaawansowane
+--Podzapytanie zakomentowane bo da się to zrobić prościej bez podzapytania
+SELECT 
+    EXTRACT(YEAR FROM prac.zatrudniony) AS"ROK",
+    COUNT(prac.zatrudniony) AS"LICZBA"    -->To dziala jak podzapytanie poniżej
+--    (SELECT COUNT(id_prac)
+--     FROM pracownicy
+--     WHERE EXTRACT(YEAR FROM pracownicy.zatrudniony)= EXTRACT(YEAR FROM prac.zatrudniony))
+FROM
+    pracownicy prac
+GROUP BY
+    EXTRACT(YEAR FROM prac.zatrudniony)
+ORDER BY
+    COUNT(prac.zatrudniony) DESC  
+
+========================================================================================================
+--ZADANIE 8 SQL_06b_PodzapytaniaZaawansowane
+--Podzapytanie zakomentowane bo da się to zrobić prościej bez podzapytania
+SELECT 
+    EXTRACT(YEAR FROM prac.zatrudniony) AS"ROK",
+    COUNT(prac.zatrudniony) AS"LICZBA"    -->To dziala jak podzapytanie poniżej
+--    (SELECT COUNT(id_prac)
+--     FROM pracownicy
+--     WHERE EXTRACT(YEAR FROM pracownicy.zatrudniony)= EXTRACT(YEAR FROM prac.zatrudniony))
+FROM
+    pracownicy prac
+GROUP BY
+    EXTRACT(YEAR FROM prac.zatrudniony)
+HAVING
+    COUNT(prac.zatrudniony) = ( SELECT MAX(COUNT(zatrudniony))
+                                FROM pracownicy
+                                GROUP BY 
+                                EXTRACT(YEAR FROM pracownicy.zatrudniony)) 
+ORDER BY
+    COUNT(prac.zatrudniony) DESC   
+
+========================================================================================================
+--ZADANIE 9a SQL_06b_PodzapytaniaZaawansowane
+--SPOSÓB 1 - podzapytanie w klauzuli SELECT
+SELECT
+    prac.nazwisko,
+    prac.placa_pod,
+    (   SELECT prac.placa_pod-AVG(pracownicy.placa_pod)
+        FROM   pracownicy
+        WHERE  pracownicy.id_zesp=prac.id_zesp) AS "ROZNICA" 
+FROM
+    pracownicy prac
+ORDER BY
+    prac.nazwisko
 
 
 
