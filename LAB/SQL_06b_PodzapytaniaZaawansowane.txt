@@ -169,6 +169,119 @@ FROM
 ORDER BY
     prac.nazwisko
 
+========================================================================================================
+--ZADANIE 9b SQL_06b_PodzapytaniaZaawansowane
+--SPOSÓB 2 - podzapytanie w klauzuli SELECT
+SELECT
+    prac.nazwisko,
+    prac.placa_pod,
+    prac.placa_pod-SREDNIA AS "ROZNICA"
+    
+FROM
+    pracownicy prac JOIN     (  SELECT p.id_zesp,AVG (p.placa_pod) AS "SREDNIA"
+                                FROM   pracownicy p
+                                GROUP BY p.id_zesp)     USING (id_zesp)
+ORDER BY
+    prac.nazwisko
 
+========================================================================================================
+--ZADANIE 10a SQL_06b_PodzapytaniaZaawansowane
+--SPOSÓB 1 - podzapytanie w klauzuli SELECT
+--nie mam pojęcia jak to zrobić tylko w samym selekcie
+SELECT
+    prac.nazwisko,
+    prac.placa_pod,
+    (   SELECT prac.placa_pod-AVG(pracownicy.placa_pod)
+        FROM   pracownicy
+        WHERE  pracownicy.id_zesp=prac.id_zesp) AS "ROZNICA" 
+FROM
+    pracownicy prac
+WHERE
+    0<( SELECT prac.placa_pod-AVG(pracownicy.placa_pod)
+        FROM   pracownicy
+        WHERE  pracownicy.id_zesp=prac.id_zesp)    
+ORDER BY
+    prac.nazwisko
 
+========================================================================================================
+--ZADANIE 10b SQL_06b_PodzapytaniaZaawansowane
+--SPOSÓB 2 - podzapytanie w klauzuli SELECT
+SELECT
+    prac.nazwisko,
+    prac.placa_pod,
+    prac.placa_pod-SREDNIA AS "ROZNICA"
+    
+FROM
+    pracownicy prac JOIN     (  SELECT p.id_zesp,AVG (p.placa_pod) AS "SREDNIA"
+                                FROM   pracownicy p
+                                GROUP BY p.id_zesp)     USING (id_zesp)
+WHERE
+     prac.placa_pod-SREDNIA>0    
+ORDER BY
+    prac.nazwisko
 
+========================================================================================================
+--ZADANIE 11 SQL_06b_PodzapytaniaZaawansowane
+SELECT
+    prof.nazwisko,
+    (SELECT COUNT(id_prac)
+     FROM   pracownicy prac
+     WHERE  prac.id_szefa =prof.id_prac) AS "PODWLADNI"
+FROM
+    pracownicy prof 
+WHERE
+    prof.etat ='PROFESOR' AND (prof.id_zesp IN (SELECT zesp.id_zesp 
+                                                FROM zespoly zesp 
+                                                WHERE zesp.adres LIKE '%PIOTROWO%'))
+ORDER BY
+   prof.nazwisko
+
+========================================================================================================
+--ZADANIE 12 SQL_06b_PodzapytaniaZaawansowane
+SELECT
+    zesp.nazwa,
+    (SELECT AVG(pracownicy.placa_pod) FROM pracownicy WHERE pracownicy.id_zesp=zesp.id_zesp) AS "SREDNIA_W_ZESPOLE",
+    (SELECT ROUND(AVG(pracownicy.placa_pod),2) FROM pracownicy) AS "SREDNIA_OGOLNA",
+    CASE
+    WHEN (SELECT AVG(pracownicy.placa_pod) FROM pracownicy WHERE pracownicy.id_zesp=zesp.id_zesp)>  
+         (SELECT ROUND(AVG(pracownicy.placa_pod),2) FROM pracownicy)    THEN ':)'
+    WHEN (SELECT AVG(pracownicy.placa_pod) FROM pracownicy WHERE pracownicy.id_zesp=zesp.id_zesp)<  
+         (SELECT ROUND(AVG(pracownicy.placa_pod),2) FROM pracownicy)    THEN ':('
+    WHEN (SELECT AVG(pracownicy.placa_pod) FROM pracownicy WHERE pracownicy.id_zesp=zesp.id_zesp)=  
+         (SELECT ROUND(AVG(pracownicy.placa_pod),2) FROM pracownicy)    THEN '-)'    
+    ELSE '???' END AS "NASTROJE"
+FROM
+    zespoly zesp 
+ORDER BY
+    zesp.nazwa 
+
+========================================================================================================
+--ZADANIE 12 SQL_06b_PodzapytaniaZaawansowane
+--rozwiazanie z joinem
+SELECT
+    nazwa,
+    SREDNIA_W_ZESPOLE,
+    SREDNIA_OGOLNA,
+    CASE
+        WHEN  SREDNIA_W_ZESPOLE - SREDNIA_OGOLNA >0     THEN ':)'    
+        WHEN  SREDNIA_W_ZESPOLE - SREDNIA_OGOLNA <0     THEN ':('
+        WHEN  SREDNIA_W_ZESPOLE - SREDNIA_OGOLNA =0     THEN '-('
+        ELSE '???'
+    END AS "NASTROJE"
+FROM
+    zespoly ZESP LEFT JOIN  (SELECT prac.id_zesp,AVG(prac.placa_pod) AS "SREDNIA_W_ZESPOLE"  FROM pracownicy prac GROUP BY prac.id_zesp) USING (id_zesp)
+            CROSS JOIN (SELECT ROUND(AVG(placa_pod),2) AS"SREDNIA_OGOLNA" FROM pracownicy)
+ORDER BY
+    nazwa
+
+========================================================================================================
+--ZADANIE 13 SQL_06b_PodzapytaniaZaawansowane
+SELECT
+    *
+FROM
+    etaty e
+ORDER BY
+    (SELECT COUNT(*)    FROM pracownicy prac WHERE e.nazwa = prac.etat) DESC,
+    e.nazwa ASC
+
+========================================================================================================
