@@ -1,0 +1,53 @@
+--Liczy sobie po kolei i wszystko jasne jak rekrurencja dziala
+WITH liczydlo(liczba) AS
+    (   SELECT 1 
+        FROM dual
+    UNION ALL     
+        SELECT liczba+1
+        FROM   liczydlo
+        WHERE  liczba <100) 
+SELECT *
+FROM liczydlo;
+========================================================================================================
+--Jak rekurecja to musi byc ciag fibonacciego
+WITH fibonacci(wyraz,wartosc_n,wartosc_poprzedni) AS
+    (   SELECT 1,1,0 
+        FROM dual
+    UNION ALL
+        SELECT wyraz+1,wartosc_n+wartosc_poprzedni,wartosc_n
+        FROM fibonacci
+        WHERE wyraz <40) --tu wpisac do którego wyrazu ma liczyć nie przesadzać bo server padnie
+SELECT 
+    f.wyraz AS wyraz,
+    wartosc_n  wartosc
+FROM fibonacci f;
+========================================================================================================
+--idzie po szefach w górę
+WITH hierarchia_up(robol,szef) AS
+    (   SELECT id_prac, id_szefa
+        FROM pracownicy
+        WHERE nazwisko = 'JEZIERSKI'
+    UNION ALL     
+        SELECT h.robol,p.id_szefa
+        FROM pracownicy p JOIN hierarchia_up h ON h.szef = p.id_prac) 
+SELECT *
+FROM hierarchia_up;
+========================================================================================================
+--idzie po szefach w górę
+WITH hierarchia_down(nadszef,szef ,id_robola) AS
+    (   SELECT nazwisko,id_szefa, id_prac 
+        FROM pracownicy
+        WHERE nazwisko = 'WEGLARZ'
+    UNION ALL     
+        SELECT h.nadszef,h.id_robola, p.id_prac 
+        FROM hierarchia_down h JOIN pracownicy p  ON h.id_robola = p.id_szefa) 
+SELECT *
+FROM hierarchia_down;
+========================================================================================================
+
+
+
+
+
+
+

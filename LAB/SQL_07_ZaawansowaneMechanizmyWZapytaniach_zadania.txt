@@ -1,0 +1,130 @@
+--ZADANIE 01 SQL_07_ZaawansowaneMechanizmyWZapytaniach_zadania
+--Z pomącą FETCH
+SELECT
+    p.nazwisko,
+    p.placa_pod
+FROM
+    pracownicy p
+ORDER BY
+    p.placa_pod DESC FETCH FIRST 3 ROWS ONLY; 
+========================================================================================================
+--ZADANIE 01 SQL_07_ZaawansowaneMechanizmyWZapytaniach_zadania
+--Z pomącą ROWNUM
+SELECT
+    nazwisko,
+    placa_pod
+FROM (SELECT
+        p.nazwisko,
+        p.placa_pod
+    FROM
+        pracownicy p
+    ORDER BY
+        p.placa_pod DESC) 
+WHERE
+    ROWNUM<=3    
+========================================================================================================   
+--ZADANIE 02 SQL_07_ZaawansowaneMechanizmyWZapytaniach_zadania
+--Z pomącą OFFSET
+SELECT
+    p.nazwisko,
+    p.placa_pod
+FROM
+    pracownicy p
+ORDER BY
+    p.placa_pod DESC OFFSET 5 ROWS FETCH NEXT 5 ROWS ONLY;
+========================================================================================================  
+--ZADANIE 02 SQL_07_ZaawansowaneMechanizmyWZapytaniach_zadania
+--Z pomącą ROWNUM
+SELECT
+    nazwisko,
+    placa_pod
+FROM( SELECT ROWNUM AS kolejnosc,nazwisko,placa_pod
+      FROM (  SELECT p.nazwisko,p.placa_pod
+              FROM pracownicy p
+              ORDER BY p.placa_pod DESC)) 
+WHERE
+    kolejnosc>=6 AND  kolejnosc<=10  
+========================================================================================================
+--ZADANIE 03 SQL_07_ZaawansowaneMechanizmyWZapytaniach_zadania
+WITH
+SREDNIA AS( SELECT p.id_zesp, AVG(p.placa_pod) AS "SR" 
+            FROM pracownicy p
+            GROUP BY p.id_zesp)
+SELECT
+     nazwisko,
+     placa_pod,
+     placa_pod-SR AS "ROZNICA"
+FROM
+    pracownicy prac JOIN SREDNIA USING(id_zesp)
+WHERE
+    placa_pod > SR
+ORDER BY
+    nazwisko
+========================================================================================================
+--ZADANIE 04 SQL_07_ZaawansowaneMechanizmyWZapytaniach_zadania
+WITH
+LATA AS(    SELECT EXTRACT(YEAR FROM p.zatrudniony) AS ROK,COUNT(p.id_prac) AS LICZBA  
+            FROM pracownicy p
+            GROUP BY EXTRACT(YEAR FROM p.zatrudniony)
+            ORDER BY LICZBA DESC )
+SELECT
+    *
+FROM 
+    LATA;
+========================================================================================================
+--ZADANIE 05 SQL_07_ZaawansowaneMechanizmyWZapytaniach_zadania
+WITH
+LATA AS(    SELECT EXTRACT(YEAR FROM p.zatrudniony) AS ROK,COUNT(p.id_prac) AS LICZBA  
+            FROM pracownicy p
+            GROUP BY EXTRACT(YEAR FROM p.zatrudniony)
+            ORDER BY LICZBA DESC )
+SELECT
+    *
+FROM 
+    LATA l
+WHERE
+    L.LICZBA=(SELECT MAX(liczba) FROM LATA);
+========================================================================================================
+--ZADANIE 06 SQL_07_ZaawansowaneMechanizmyWZapytaniach_zadania
+WITH
+Asystenci AS (SELECT * FROM pracownicy WHERE etat ='ASYSTENT'),  
+Piotrowo  AS (SELECT * FROM zespoly    WHERE adres LIKE '%PIOTROWO%')
+
+SELECT 
+    nazwisko,
+    etat,
+    nazwa,
+    adres
+FROM
+    Asystenci JOIN Piotrowo USING(id_zesp)
+ORDER BY 
+    id_prac; 
+======================================================================================================== 
+--ZADANIE 07 SQL_07_ZaawansowaneMechanizmyWZapytaniach_zadania
+WITH
+SUMY AS (SELECT id_zesp,SUM(placa_pod) AS suma FROM pracownicy GROUP BY id_zesp)
+
+SELECT
+    nazwa,
+    suma AS MAKS_SUMA_PLAC 
+FROM
+    zespoly JOIN SUMY USING(id_zesp)
+WHERE
+    suma = (SELECT MAX(suma) FROM SUMY); 
+======================================================================================================== 
+
+
+WITH
+podwladni (id_prac, id_szefa, nazwisko, poziom) AS
+-- definicja korzenia hierarchii 
+(SELECT id_prac, id_szefa, nazwisko, 1
+FROM pracownicy
+WHERE NAZWISKO = 'BRZEZINSKI'
+UNION ALL -- rekurencyjna definicja niższych poziomów
+SELECT p.id_prac, p.id_szefa, p.nazwisko, poziom+1
+FROM podwladni s JOIN pracownicy p ON s.id_prac = p.id_szefa) 
+-- wskazanie sposobu przeszukiwania hierarchii i sortowania rekordów-dzieci 
+SEARCH DEPTH FIRST BY nazwisko SET porzadek_potomkow
+SELECT id_prac, id_szefa, nazwisko, poziom
+FROM podwladni ORDER BY porzadek_potomkow; 
+    
