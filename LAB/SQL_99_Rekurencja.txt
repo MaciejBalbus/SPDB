@@ -33,7 +33,7 @@ WITH hierarchia_up(robol,szef) AS
 SELECT *
 FROM hierarchia_up;
 ========================================================================================================
---idzie po szefach w górę
+--idzie po szefach w dół
 WITH hierarchia_down(nadszef,szef ,id_robola) AS
     (   SELECT nazwisko,id_szefa, id_prac 
         FROM pracownicy
@@ -44,10 +44,3 @@ WITH hierarchia_down(nadszef,szef ,id_robola) AS
 SELECT *
 FROM hierarchia_down;
 ========================================================================================================
-
-
-
-
-
-
-

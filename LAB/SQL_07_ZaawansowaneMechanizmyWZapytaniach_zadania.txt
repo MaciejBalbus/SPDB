@@ -112,19 +112,32 @@ FROM
 WHERE
     suma = (SELECT MAX(suma) FROM SUMY); 
 ======================================================================================================== 
+--ZADANIE 07 SQL_08_ZaawansowaneMechanizmyWZapytaniach_zadania
+WITH hierarchia_down(badany,szef ,id_robola,nazwisko_robola,pozycja) AS
+    (   SELECT nazwisko,id_szefa, id_prac,nazwisko,1 
+        FROM pracownicy
+        WHERE nazwisko = 'BRZEZINSKI'
+    UNION ALL     
+        SELECT h.badany,h.id_robola, p.id_prac,p.nazwisko,pozycja +1 
+        FROM hierarchia_down h JOIN pracownicy p  ON h.id_robola = p.id_szefa) 
 
+SELECT 
+    nazwisko_robola AS "NAZWISKO",
+    pozycja AS "POZYCJA_W_HIERARCHII"  
+FROM hierarchia_down
+ORDER BY POZYCJA_W_HIERARCHII,NAZWISKO;
+======================================================================================================== 
+--ZADANIE 07 SQL_09_ZaawansowaneMechanizmyWZapytaniach_zadania
+WITH hierarchia_down(badany,szef ,id_robola,nazwisko_robola,pozycja) AS
+    (   SELECT nazwisko,id_szefa, id_prac,nazwisko,1 
+        FROM pracownicy
+        WHERE nazwisko = 'BRZEZINSKI'
+    UNION ALL     
+        SELECT h.badany,h.id_robola, p.id_prac,p.nazwisko,pozycja +1 
+        FROM hierarchia_down h JOIN pracownicy p  ON h.id_robola = p.id_szefa) 
 
-WITH
-podwladni (id_prac, id_szefa, nazwisko, poziom) AS
--- definicja korzenia hierarchii 
-(SELECT id_prac, id_szefa, nazwisko, 1
-FROM pracownicy
-WHERE NAZWISKO = 'BRZEZINSKI'
-UNION ALL -- rekurencyjna definicja niższych poziomów
-SELECT p.id_prac, p.id_szefa, p.nazwisko, poziom+1
-FROM podwladni s JOIN pracownicy p ON s.id_prac = p.id_szefa) 
--- wskazanie sposobu przeszukiwania hierarchii i sortowania rekordów-dzieci 
-SEARCH DEPTH FIRST BY nazwisko SET porzadek_potomkow
-SELECT id_prac, id_szefa, nazwisko, poziom
-FROM podwladni ORDER BY porzadek_potomkow; 
-    
+SELECT
+    LPAD(nazwisko_robola,LENGTH(nazwisko_robola)+pozycja-1,' ') AS "NAZWISKO",
+    pozycja AS "POZYCJA_W_HIERARCHII"  
+FROM hierarchia_down
+ORDER BY POZYCJA_W_HIERARCHII,NAZWISKO;    
