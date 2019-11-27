@@ -112,7 +112,7 @@ FROM
 WHERE
     suma = (SELECT MAX(suma) FROM SUMY); 
 ======================================================================================================== 
---ZADANIE 07 SQL_08_ZaawansowaneMechanizmyWZapytaniach_zadania
+--ZADANIE 08 SQL_07_ZaawansowaneMechanizmyWZapytaniach_zadania
 WITH hierarchia_down(badany,szef ,id_robola,nazwisko_robola,pozycja) AS
     (   SELECT nazwisko,id_szefa, id_prac,nazwisko,1 
         FROM pracownicy
@@ -127,7 +127,7 @@ SELECT
 FROM hierarchia_down
 ORDER BY POZYCJA_W_HIERARCHII,NAZWISKO;
 ======================================================================================================== 
---ZADANIE 07 SQL_09_ZaawansowaneMechanizmyWZapytaniach_zadania
+--ZADANIE 09 SQL_07_ZaawansowaneMechanizmyWZapytaniach_zadania
 WITH hierarchia_down(badany,szef ,id_robola,nazwisko_robola,pozycja) AS
     (   SELECT nazwisko,id_szefa, id_prac,nazwisko,1 
         FROM pracownicy
