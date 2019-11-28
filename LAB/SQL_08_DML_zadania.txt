@@ -1,0 +1,248 @@
+--ZADANIE 01 SQL_08_DML_zadania
+--SPOSÓB 1 bez nazw atrybutów dodawanie pojedynczo
+INSERT INTO pracownicy VALUES (250,'KOWALSKI','ASYSTENT',NULL,DATE'2015-01-13',1500,NULL,10);
+INSERT INTO pracownicy VALUES (260,'ADAMSKI','ASYSTENT',NULL,DATE'2014-09-10',1500,NULL,10);
+INSERT INTO pracownicy VALUES (270,'NOWAK','ADIUNKT',NULL,DATE'1990-05-01',2050,540,20);
+--------------------------------------------------------------------------------------------------------
+--ZADANIE 01 SQL_08_DML_zadania
+--SPOSÓB 2 z nazwami atrybutów dodawanie pojedynczo
+INSERT INTO pracownicy( ID_PRAC,NAZWISKO,  ETAT,      ZATRUDNIONY,       PLACA_POD,ID_ZESP)
+       VALUES (         250,   'KOWALSKI', 'ASYSTENT',DATE'2015-01-13',   1500,     10);
+INSERT INTO pracownicy ( ID_PRAC,NAZWISKO, ETAT,      ZATRUDNIONY,       PLACA_POD,ID_ZESP)
+       VALUES (          260,   'ADAMSKI', 'ASYSTENT',DATE'2014-09-10',  1500,     10);
+INSERT INTO pracownicy ( ID_PRAC,NAZWISKO, ETAT,      ZATRUDNIONY,       PLACA_POD, PLACA_DOD,ID_ZESP)
+       VALUES (          270,'NOWAK',      'ADIUNKT', DATE'1990-05-01',  2050,      540,      20);
+
+SELECT 
+    *
+FROM 
+    pracownicy
+WHERE 
+    id_prac >245
+ORDER BY pracownicy.id_prac;
+========================================================================================================
+--ZADANIE 02 SQL_08_DML_zadania
+UPDATE  pracownicy prac
+SET prac.placa_pod = 1.1*prac.placa_pod,
+    prac.placa_dod = coalesce(1.2*prac.placa_dod,100)
+WHERE 
+    id_prac >245;
+
+SELECT 
+    *
+FROM 
+    pracownicy
+WHERE 
+    id_prac >245
+ORDER BY pracownicy.id_prac;
+========================================================================================================
+--ZADANIE 03 SQL_08_DML_zadania
+INSERT INTO zespoly (nazwa,id_zesp,adres)
+       VALUES ('BAZY DANYCH',60,'PIOTROWO 2');
+
+SELECT 
+    *
+FROM 
+    zespoly
+WHERE 
+    id_zesp>50
+========================================================================================================
+--ZADANIE 04 SQL_08_DML_zadania
+UPDATE  pracownicy prac
+SET id_zesp = (SELECT zesp.id_zesp   FROM zespoly zesp WHERE nazwa ='BAZY DANYCH')
+WHERE 
+    prac.id_prac >245;
+
+SELECT 
+    *
+FROM 
+    pracownicy
+WHERE 
+    id_prac >245
+ORDER BY pracownicy.id_prac;
+========================================================================================================
+--ZADANIE 05 SQL_08_DML_zadania
+
+UPDATE pracownicy
+SET id_szefa =(SELECT id_prac FROM pracownicy WHERE nazwisko='MORZY')  
+WHERE 
+    id_zesp =(SELECT zesp.id_zesp   FROM zespoly zesp WHERE nazwa ='BAZY DANYCH');
+
+SELECT 
+    *
+FROM 
+    pracownicy
+WHERE 
+    id_szefa =(SELECT id_prac FROM pracownicy WHERE nazwisko='MORZY')
+ORDER BY pracownicy.id_prac;
+========================================================================================================
+--ZADANIE 06 SQL_08_DML_zadania
+DELETE FROM zespoly
+WHERE nazwa='BAZY DANYCH';
+
+polecenie odrzucone przez silnik
+Error report -
+ORA-02292: naruszono więzy spójności 
+========================================================================================================
+--ZADANIE 07 SQL_08_DML_zadania
+DELETE FROM pracownicy
+WHERE id_zesp = (SELECT zesp.id_zesp   FROM zespoly zesp WHERE nazwa ='BAZY DANYCH');
+
+DELETE FROM zespoly
+WHERE nazwa='BAZY DANYCH';
+
+SELECT *
+FROM pracownicy
+WHERE id_zesp = (SELECT zesp.id_zesp   FROM zespoly zesp WHERE nazwa ='BAZY DANYCH');
+
+SELECT *
+FROM zespoly
+WHERE id_zesp =(SELECT zesp.id_zesp   FROM zespoly zesp WHERE nazwa ='BAZY DANYCH');
+========================================================================================================
+--ZADANIE 08 SQL_08_DML_zadania
+SELECT 
+    prac.nazwisko,
+    prac.placa_pod,
+    (SELECT 0.1*AVG(placa_pod) FROM pracownicy WHERE id_zesp =prac.id_zesp) AS "PODWYZKA"
+FROM
+    pracownicy prac
+ORDER BY
+    prac.nazwisko;    
+========================================================================================================
+--ZADANIE 09 SQL_08_DML_zadania
+UPDATE pracownicy prac
+SET    prac.placa_pod = prac.placa_pod+(SELECT 0.1*AVG(placa_pod) FROM pracownicy WHERE id_zesp =prac.id_zesp);
+
+SELECT 
+    prac.nazwisko,
+    prac.placa_pod
+FROM
+    pracownicy prac
+ORDER BY
+    prac.nazwisko;   
+========================================================================================================
+--ZADANIE 10 SQL_08_DML_zadania
+SELECT
+    *
+FROM
+    pracownicy
+ORDER BY
+    placa_pod FETCH FIRST 1 ROWS WITH TIES;
+========================================================================================================
+--ZADANIE 11 SQL_08_DML_zadania
+UPDATE pracownicy prac
+SET prac.placa_pod = (SELECT ROUND(AVG(placa_pod),2) AS "PODWYZKA"   FROM pracownicy)
+WHERE prac.id_prac = (SELECT id_prac FROM pracownicy ORDER BY placa_pod FETCH FIRST 1 ROWS WITH TIES);
+
+
+SELECT 
+    *
+FROM
+    pracownicy
+WHERE
+    nazwisko = 'ZAKRZEWICZ';
+========================================================================================================
+--ZADANIE 12 SQL_08_DML_zadania
+SELECT
+    NAZWISKO,
+    PLACA_DOD
+FROM
+    pracownicy
+WHERE
+    id_zesp =20
+ORDER BY
+    NAZWISKO;
+    
+UPDATE PRACOWNICY PRAC   
+SET    PRAC.PLACA_DOD = (SELECT ROUND(AVG(PLACA_POD),2) AS SREDNIA
+                        FROM   PRACOWNICY
+                        WHERE  ID_SZEFA = (SELECT ID_PRAC FROM PRACOWNICY WHERE  NAZWISKO ='MORZY'))
+WHERE
+    id_zesp =20; 
+    
+SELECT
+    NAZWISKO,
+    PLACA_DOD
+FROM
+    pracownicy
+WHERE
+    id_zesp =20
+ORDER BY
+    NAZWISKO;
+========================================================================================================
+--ZADANIE 13 SQL_08_DML_zadania
+SELECT 
+    NAZWISKO,
+    PLACA_POD
+FROM
+    PRACOWNICY JOIN ZESPOLY USING (ID_ZESP)
+WHERE
+    NAZWA ='SYSTEMY ROZPROSZONE'
+ORDER BY
+    NAZWISKO;
+    
+UPDATE  (SELECT NAZWISKO,PLACA_POD FROM PRACOWNICY JOIN ZESPOLY USING (ID_ZESP) WHERE NAZWA ='SYSTEMY ROZPROSZONE')
+SET PLACA_POD=1.25*PLACA_POD;
+
+
+SELECT 
+    NAZWISKO,
+    PLACA_POD
+FROM
+    PRACOWNICY JOIN ZESPOLY USING (ID_ZESP)
+WHERE
+    NAZWA ='SYSTEMY ROZPROSZONE'
+ORDER BY
+    NAZWISKO;
+========================================================================================================   
+--ZADANIE 14 SQL_08_DML_zadania
+SELECT
+    PRAC.NAZWISKO AS "PRACOWNIK",
+    SZEF.NAZWISKO AS "SZEF"
+FROM
+    PRACOWNICY PRAC JOIN PRACOWNICY SZEF ON PRAC.ID_SZEFA = SZEF.ID_PRAC
+WHERE
+    SZEF.NAZWISKO='MORZY';
+    
+DELETE FROM (SELECT  PRAC.NAZWISKO AS "PRACOWNIK",SZEF.NAZWISKO AS "SZEF"
+             FROM  PRACOWNICY PRAC JOIN PRACOWNICY SZEF ON PRAC.ID_SZEFA = SZEF.ID_PRAC)
+WHERE SZEF='MORZY';     
+
+SELECT
+    PRAC.NAZWISKO AS "PRACOWNIK",
+    SZEF.NAZWISKO AS "SZEF"
+FROM
+    PRACOWNICY PRAC JOIN PRACOWNICY SZEF ON PRAC.ID_SZEFA = SZEF.ID_PRAC
+WHERE
+    SZEF.NAZWISKO='MORZY';
+======================================================================================================== 
+--ZADANIE 15 SQL_08_DML_zadania
+SELECT 
+    *
+FROM
+    PRACOWNICY
+ORDER BY
+    NAZWISKO;
+========================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------
+========================================================================================================
+
+
+
+
+
+
