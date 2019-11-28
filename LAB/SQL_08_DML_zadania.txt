@@ -224,25 +224,54 @@ FROM
 ORDER BY
     NAZWISKO;
 ========================================================================================================
+--ZADANIE 16 SQL_08_DML_zadania
+CREATE SEQUENCE PRAC_SEQ START WITH 300 INCREMENT BY 10;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
---------------------------------------------------------------------------------------------------------
 ========================================================================================================
+--ZADANIE 17 SQL_08_DML_zadania
+INSERT INTO pracownicy( ID_PRAC,         NAZWISKO,      ETAT,PLACA_POD)
+       VALUES         ( PRAC_SEQ.NEXTVAL,'Trąbczyński', 'STAZYSTA',1000);
+
+SELECT 
+    *
+FROM 
+    PRACOWNICY
+WHERE
+    NAZWISKO = 'Trąbczyński'
+
+========================================================================================================
+--ZADANIE 18 SQL_08_DML_zadania
+UPDATE PRACOWNICY PRAC
+SET PLACA_DOD=PRAC_SEQ.CURRVAL
+WHERE NAZWISKO = 'Trąbczyński' ;
+
+SELECT 
+    *
+FROM 
+    PRACOWNICY
+WHERE
+    NAZWISKO = 'Trąbczyński'
+
+========================================================================================================
+--ZADANIE 19 SQL_08_DML_zadania
+DELETE PRACOWNICY 
+WHERE NAZWISKO = 'Trąbczyński' ;
+
+========================================================================================================
+--ZADANIE 20 SQL_08_DML_zadania
+CREATE SEQUENCE MALA_SEQ START WITH 1 INCREMENT BY 5 MAXVALUE 10;
+
+SELECT MALA_SEQ.NEXTVAL FROM DUAL;
 
 
 
+Error starting at line : 4 in command -
+SELECT MALA_SEQ.NEXTVAL FROM DUAL
+Error report -
+ORA-08004: sekwencja MALA_SEQ.NEXTVAL exceeds MAXVALUE i nie może być przyjęte
 
+========================================================================================================
+--ZADANIE 21 SQL_08_DML_zadania
+DROP SEQUENCE MALA_SEQ;
 
-
+========================================================================================================
