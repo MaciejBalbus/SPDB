@@ -1,0 +1,148 @@
+--ZADANIE 01 SQL_09_DDL_czesc_2_zadania
+ALTER TABLE PROJEKTY 
+ADD CONSTRAINT
+    PK_PROJEKTY  PRIMARY KEY (ID_PROJEKTU);
+
+ALTER TABLE PROJEKTY 
+ADD CONSTRAINT
+    UK_PROJEKTY  UNIQUE (OPIS_PROJEKTU);
+
+ALTER TABLE PROJEKTY MODIFY OPIS_PROJEKTU CONSTRAINT OpisNiePusty  NOT NULL;
+
+ALTER TABLE PROJEKTY 
+ADD CONSTRAINT 
+    WALIDACJA_DATY  CHECK(DATA_ROZPOCZECIA<DATA_ZAKONCZENIA);  
+
+ALTER TABLE PROJEKTY 
+ADD CONSTRAINT 
+    WALIDACJA_FUNDUSZ  CHECK(0<FUNDUSZ); 
+
+
+SELECT
+    CONSTRAINT_NAME,
+    CONSTRAINT_TYPE AS C_TYPE,
+    SEARCH_CONDITION,
+    COLUMN_NAME
+FROM
+    USER_CONSTRAINTS  JOIN user_cons_columns   using(constraint_name,table_name,owner) 
+WHERE table_name ='PROJEKTY';
+
+========================================================================================================
+--ZADANIE 02 SQL_09_DDL_czesc_2_zadania
+INSERT  INTO PROJEKTY
+        VALUES (DEFAULT, 'Indeksy bitmapowe',DATE'2015-04-12',DATE'2016-09-30',40000);
+
+Error report -
+ORA-00001: naruszono więzy unikatowe (SPBD_BALBUS_M.UK_PROJEKTY)
+
+========================================================================================================
+--ZADANIE 03 SQL_09_DDL_czesc_2_zadania
+CREATE TABLE PRZYDZIALY(
+        ID_PROJEKTU NUMBER(4)   CONSTRAINT NIE_PUSTY_ID_PROJEKTU NOT NULL 
+                                CONSTRAINT FK_PRZYDZIALY_01 REFERENCES PROJEKTY(ID_PROJEKTU),
+        NR_PRACOWNIKA NUMBER(6) CONSTRAINT NIE_PUSTY_NR_PRACOWNIKA NOT NULL 
+                                CONSTRAINT FK_PRZYDZIALY_02 REFERENCES PRACOWNICY(ID_PRAC),
+        OD DATE                 DEFAULT SYSDATE,
+        DO DATE,
+        STAWKA NUMBER(7,2),     CONSTRAINT CHK_PRZYDZIALY_STAWKA CHECK(0<STAWKA),
+        ROLA CHARACTER VARYING(20) CONSTRAINT PRZYDZIALY_ROLA CHECK(ROLA IN('KIERUJĄCY','ANALITYK','PROGRAMISTA')),
+     CONSTRAINT CHK_PRZYDZIALY_DATY CHECK (OD<DO));
+
+========================================================================================================
+--ZADANIE 04 SQL_09_DDL_czesc_2_zadania
+INSERT  INTO PRZYDZIALY ( ID_PROJEKTU,NR_PRACOWNIKA,OD,DO,STAWKA,ROLA)
+        VALUES ((SELECT ID_PROJEKTU FROM PROJEKTY WHERE OPIS_PROJEKTU = 'Indeksy bitmapowe'),
+                170,DATE'1999-04-10',DATE'1999-05-10',1000,'KIERUJĄCY');
+
+INSERT  INTO PRZYDZIALY ( ID_PROJEKTU,NR_PRACOWNIKA,OD,DO,STAWKA,ROLA)
+        VALUES ((SELECT ID_PROJEKTU FROM PROJEKTY WHERE OPIS_PROJEKTU = 'Indeksy bitmapowe'),
+                140,DATE'2000-12-01',NULL,1500,'ANALITYK');
+
+INSERT  INTO PRZYDZIALY ( ID_PROJEKTU,NR_PRACOWNIKA,OD,STAWKA,ROLA)
+        VALUES ((SELECT ID_PROJEKTU FROM PROJEKTY WHERE OPIS_PROJEKTU = 'Sieci kręgosupowe'),
+                140,DATE'2015-09-14',2500,'KIERUJĄCY');
+
+SELECT * FROM PRZYDZIALY;  
+
+========================================================================================================
+--ZADANIE 05 SQL_09_DDL_czesc_2_zadania
+
+ALTER TABLE PRZYDZIALY
+ADD GODZINY NUMBER(3)   CONSTRAINT GODZINY_NIE_PUSTY  NOT NULL 
+                        CONSTRAINT GODZINY_NIE_UJEMNE CHECK(0<GODZINY);
+Error report -
+ORA-01758: aby dodać obowiązkową kolumnę (NOT NULL) tabela musi być pusta
+01758. 00000 -  "table must be empty to add mandatory (NOT NULL) column"
+
+========================================================================================================
+--ZADANIE 06 SQL_09_DDL_czesc_2_zadania
+
+ALTER TABLE PRZYDZIALY
+ADD GODZINY NUMBER(3); 
+
+UPDATE PRZYDZIALY 
+SET GODZINY = ID_PROJEKTU *2;
+
+ALTER TABLE PRZYDZIALY
+ADD CONSTRAINT GODZINY_NIE_UJEMNE CHECK(0<GODZINY);
+
+ALTER TABLE PRZYDZIALY
+MODIFY GODZINY CONSTRAINT GODZINY_NOT_NULL NOT NULL; 
+
+========================================================================================================
+--ZADANIE 07 SQL_09_DDL_czesc_2_zadania
+ALTER TABLE PROJEKTY 
+DISABLE CONSTRAINT UK_PROJEKTY; 
+
+SELECT
+    CONSTRAINT_NAME,
+    STATUS
+FROM
+    USER_CONSTRAINTS  JOIN user_cons_columns   using(constraint_name,table_name,owner) 
+WHERE table_name ='PROJEKTY' AND CONSTRAINT_NAME ='UK_PROJEKTY' ;
+
+========================================================================================================
+--ZADANIE 08 SQL_09_DDL_czesc_2_zadania
+INSERT  INTO PROJEKTY
+        VALUES (DEFAULT, 'Indeksy bitmapowe',DATE'2015-04-12',DATE'2016-09-30',40000);
+
+SELECT 
+    *
+FROM
+    PROJEKTY;
+
+========================================================================================================
+--ZADANIE 09 SQL_09_DDL_czesc_2_zadania
+
+ALTER TABLE PROJEKTY 
+ENABLE CONSTRAINT UK_PROJEKTY; 
+
+Error report -
+ORA-02299: nie można zweryfikować poprawności (SPBD_BALBUS_M.UK_PROJEKTY) - znaleziono zduplikowane klucze
+
+========================================================================================================
+--ZADANIE 10 SQL_09_DDL_czesc_2_zadania
+UPDATE PROJEKTY
+SET OPIS_PROJEKTU ='Inne indeksy'
+WHERE FUNDUSZ = 40000;
+
+ALTER TABLE PROJEKTY 
+ENABLE CONSTRAINT UK_PROJEKTY; 
+
+SELECT
+    CONSTRAINT_NAME,
+    STATUS
+FROM
+    USER_CONSTRAINTS  JOIN user_cons_columns   using(constraint_name,table_name,owner) 
+WHERE table_name ='PROJEKTY' AND CONSTRAINT_NAME ='UK_PROJEKTY' ;
+
+========================================================================================================
+--ZADANIE 11 SQL_09_DDL_czesc_2_zadania
+ALTER TABLE PROJEKTY 
+MODIFY OPIS_PROJEKTU CHARACTER VARYING(10);  
+
+Error report -
+ORA-01441: nie można zmniejszyć długości kolumny, ponieważ niektóre wartości są zbyt duże
+
+========================================================================================================
+
