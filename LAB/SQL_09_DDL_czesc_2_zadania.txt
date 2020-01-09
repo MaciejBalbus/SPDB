@@ -145,4 +145,48 @@ Error report -
 ORA-01441: nie można zmniejszyć długości kolumny, ponieważ niektóre wartości są zbyt duże
 
 ========================================================================================================
+--ZADANIE 12 SQL_09_DDL_czesc_2_zadania
+DELETE FROM PROJEKTY
+WHERE OPIS_PROJEKTU ='Sieci kręgosupowe';
+
+Error report -
+ORA-02292: naruszono więzy spójności (HR.FK_PRZYDZIALY_01) - znaleziono rekord podrzędny
+
+========================================================================================================
+--ZADANIE 13 SQL_09_DDL_czesc_2_zadania
+ALTER TABLE PRZYDZIALY DROP CONSTRAINT FK_PRZYDZIALY_01;
+
+ALTER TABLE PRZYDZIALY 
+ADD CONSTRAINT FK_PRZYDZIALY_01   
+FOREIGN KEY (ID_PROJEKTU) 
+REFERENCES PROJEKTY(ID_PROJEKTU) ON DELETE CASCADE;
+
+DELETE FROM PROJEKTY
+WHERE OPIS_PROJEKTU ='Sieci kręgosupowe';
+
+SELECT 
+    *
+FROM     
+    PROJEKTY;
+    
+SELECT 
+    *
+FROM     
+    PRZYDZIALY;
+
+========================================================================================================
+--ZADANIE 14 SQL_09_DDL_czesc_2_zadania
+DROP TABLE PROJEKTY CASCADE CONSTRAINTS; 
+
+SELECT
+    CONSTRAINT_NAME,
+    CONSTRAINT_TYPE AS C,
+     SEARCH_CONDITION   
+    
+FROM
+    USER_CONSTRAINTS
+WHERE table_name ='PRZYDZIALY';
+
+========================================================================================================
+
 
