@@ -46,7 +46,8 @@ CREATE TABLE PRZYDZIALY(
         DO DATE,
         STAWKA NUMBER(7,2),     CONSTRAINT CHK_PRZYDZIALY_STAWKA CHECK(0<STAWKA),
         ROLA CHARACTER VARYING(20) CONSTRAINT PRZYDZIALY_ROLA CHECK(ROLA IN('KIERUJĄCY','ANALITYK','PROGRAMISTA')),
-     CONSTRAINT CHK_PRZYDZIALY_DATY CHECK (OD<DO));
+     CONSTRAINT CHK_PRZYDZIALY_DATY CHECK (OD<DO),
+     CONSTRAINT PK_PRZYDZIALY PRIMARY KEY(ID_PROJEKTU, NR_PRACOWNIKA));
 
 ========================================================================================================
 --ZADANIE 04 SQL_09_DDL_czesc_2_zadania
@@ -188,5 +189,13 @@ FROM
 WHERE table_name ='PRZYDZIALY';
 
 ========================================================================================================
+--ZADANIE 15 SQL_09_DDL_czesc_2_zadania
+DROP TABLE PRZYDZIALY CASCADE CONSTRAINTS; 
+DROP TABLE PROJEKTY_KOPIA CASCADE CONSTRAINTS;
+
+SELECT 
+    TABLE_NAME
+FROM
+    USER_TABLES;  
 
 
