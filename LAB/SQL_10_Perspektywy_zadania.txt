@@ -35,3 +35,97 @@ SELECT
     *
 FROM
     PLACE;
+
+========================================================================================================
+ZADANIE 03 SQL_10_Perspektywy_zadania
+SELECT
+    nazwisko,
+    PLACA_POD
+FROM
+    PRACOWNICY JOIN place USING(ID_ZESP)
+WHERE
+    PLACA_POD+COALESCE(PLACA_DOD,0)< SREDNIA
+ORDER BY
+   pracownicy.nazwisko;
+
+========================================================================================================
+ZADANIE 04 SQL_10_Perspektywy_zadania
+CREATE OR REPLACE VIEW PLACE_MINIMALNE
+    (ID_PRAC,NAZWISKO,ETAT,PLACA_POD)
+AS SELECT
+    ID_PRAC,    
+    NAZWISKO,
+    ETAT,
+    PLACA_POD
+FROM
+    pracownicy
+WHERE
+    PLACA_POD<700 
+ORDER BY
+    NAZWISKO
+WITH CHECK OPTION CONSTRAINT placa700;   
+    
+SELECT
+    *
+FROM
+    PLACE_MINIMALNE;
+
+========================================================================================================
+ZADANIE 05 SQL_10_Perspektywy_zadania
+
+UPDATE PLACE_MINIMALNE 
+SET PLACA_POD=800
+WHERE NAZWISKO ='HAPKE';
+
+Error report -
+ORA-01402: naruszenie klauzuli WHERE dla perspektywy z WITH CHECK OPTION
+
+========================================================================================================
+ZADANIE 06 SQL_10_Perspektywy_zadania
+CREATE OR REPLACE VIEW PRAC_SZEF
+    (ID_PRAC,ID_SZEFA,PRACOWNIK,ETAT,SZEF)
+AS SELECT
+    ID_PRAC,
+    ID_SZEFA,
+    NAZWISKO,
+    ETAT,
+    (SELECT NAZWISKO FROM PRACOWNICY WHERE P.ID_SZEFA=ID_PRAC)
+FROM
+    PRACOWNICY P
+ORDER BY
+    NAZWISKO;
+
+========================================================================================================
+ZADANIE 07 SQL_10_Perspektywy_zadania
+CREATE OR REPLACE VIEW ZAROBKI
+    (ID_PRAC,NAZWISKO,ETAT,PLACA_POD)
+AS SELECT
+    P.ID_PRAC,
+    P.NAZWISKO,
+    P.ETAT,
+    P.PLACA_POD
+FROM
+    PRACOWNICY P 
+WHERE
+    P.PLACA_POD<(SELECT PLACA_POD FROM PRACOWNICY WHERE P.ID_SZEFA=ID_PRAC)
+ORDER BY
+    NAZWISKO
+WITH CHECK OPTION CONSTRAINT placaSzefaLepsza;
+
+SELECT 
+    *
+FROM
+    ZAROBKI;    
+
+UPDATE ZAROBKI SET PLACA_POD = 2000
+WHERE NAZWISKO = 'BIALY';
+
+========================================================================================================
+ZADANIE 08 SQL_10_Perspektywy_zadania
+
+SELECT
+    *
+FROM
+    USER_UPDATABLE_COLUMNS
+WHERE
+    TABLE_NAME='PRAC_SZEF';
