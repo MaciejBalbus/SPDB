@@ -1,0 +1,73 @@
+--ZADANIE 01  PLSQL_01_zadania
+DECLARE
+
+vTekst VARCHAR(100) :='Witaj, świecie!';
+vLiczba NUMBER(7,3) DEFAULT 1000.456;
+
+BEGIN
+
+DBMS_OUTPUT.PUT_LINE('Zmienna vTekst: '||vTekst);
+DBMS_OUTPUT.PUT_LINE('Zmienna vLiczba: '||vLiczba);
+
+END;
+
+========================================================================================================
+--ZADANIE 02  PLSQL_01_zadania
+DECLARE
+
+vTekst VARCHAR(100) :='Witaj, świecie!';
+vLiczba NUMBER(19,3) DEFAULT 1000.456;
+
+BEGIN
+vTekst:=vtekst||'Witaj, nowy dniu!';
+vLiczba:=vliczba+POWER(10,15);
+DBMS_OUTPUT.PUT_LINE('Zmienna vTekst: '||vTekst);
+DBMS_OUTPUT.PUT_LINE('Zmienna vLiczba: '||vLiczba);
+
+END;
+========================================================================================================
+--ZADANIE 03  PLSQL_01_zadania
+DECLARE
+vLiczba1 NUMBER(1,7):=0.0000001;
+vLiczba2 NUMBER(6,4):=10.2356;
+vWynik   NUMBER(9,7);
+
+BEGIN
+--dodawanie w ciele funkcji PUT_LINE()
+DBMS_OUTPUT.PUT_LINE('Wynik dodawania '||vLiczba1||' i '||to_char(vLiczba2,'99D0000000')||': '|| (vliczba1+vLiczba2));
+vWynik:=vliczba1+vliczba2;
+DBMS_OUTPUT.PUT_LINE('Wynik dodawania '||vLiczba1||' i '||vLiczba2||': '|| vWynik);
+
+END;
+========================================================================================================
+--ZADANIE 04  PLSQL_01_zadania
+DECLARE
+cPi CONSTANT NUMBER(3,2):=3.14;
+vPromien NUMBER(1,0):=5;
+BEGIN
+DBMS_OUTPUT.PUT_LINE('Obwód koła o promieniu równym '||vPromien||': '|| (2*cPi*vPromien));
+DBMS_OUTPUT.PUT_LINE('Pole koła o promieniu równym '||vPromien||': '|| (cPi*POWER(vPromien,2)));
+END;
+========================================================================================================
+--ZADANIE 05  PLSQL_01_zadania
+DECLARE
+vNazwisko pracownicy.nazwisko%TYPE;
+vEtat pracownicy.etat%TYPE;
+BEGIN
+SELECT
+    nazwisko,etat
+INTO
+    vNazwisko,vEtat
+FROM
+    pracownicy
+WHERE
+    PLACA_POD=(SELECT MAX(PLACA_POD) FROM PRACOWNICY);
+    DBMS_OUTPUT.PUT_LINE ('Najlepiej zarabia pracownik '||vNazwisko);
+    DBMS_OUTPUT.PUT_LINE ('Pracuje on jako '||vEtat);
+END;
+
+
+
+
+
+
