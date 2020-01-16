@@ -65,9 +65,63 @@ WHERE
     DBMS_OUTPUT.PUT_LINE ('Najlepiej zarabia pracownik '||vNazwisko);
     DBMS_OUTPUT.PUT_LINE ('Pracuje on jako '||vEtat);
 END;
+========================================================================================================
+--ZADANIE 06  PLSQL_01_zadania
+DECLARE
+vKrotka pracownicy%ROWTYPE;
 
-
-
-
-
-
+BEGIN
+SELECT
+    *
+INTO
+    vKrotka
+FROM
+    pracownicy
+WHERE
+    PLACA_POD=(SELECT MAX(PLACA_POD) FROM PRACOWNICY);
+    DBMS_OUTPUT.PUT_LINE ('Najlepiej zarabia pracownik '||vKrotka.nazwisko);
+    DBMS_OUTPUT.PUT_LINE ('Pracuje on jako '||vKrotka.etat);
+END;
+========================================================================================================
+--ZADANIE 07  PLSQL_01_zadania
+DECLARE
+    SUBTYPE tPieniadze IS NUMBER(7,2);
+    vZarobki tPieniadze;
+BEGIN
+    SELECT
+        placa_pod*12
+    INTO
+        vZarobki
+    FROM
+        pracownicy
+    WHERE
+        nazwisko='SLOWINSKI';
+ 
+    DBMS_OUTPUT.PUT_LINE ('Pracownik SLOWINSKI zarabia rocznie '|| vZarobki);
+END;
+========================================================================================================
+--ZADANIE 08  PLSQL_01_zadania
+BEGIN
+    LOOP
+        IF EXTRACT(SECOND FROM SYSTIMESTAMP)=25 THEN
+            DBMS_OUTPUT.PUT_LINE ('Nadeszła 25 sekunda!');
+            EXIT;
+        END IF;
+    END LOOP;
+END;
+========================================================================================================
+--ZADANIE 09  PLSQL_01_zadania
+DECLARE
+    n number(3):=10;
+    vWynik number(20):=1;
+BEGIN
+    IF n<0 THEN
+        DBMS_OUTPUT.PUT_LINE ('Z liczby ('|| n||') nie da się wiliczyć silni'); 
+    ELSIF n>0 THEN
+        FOR i IN 1..n LOOP
+             vWynik:= vWynik*i;
+        END LOOP;
+    END IF;
+    DBMS_OUTPUT.PUT_LINE ('Silnia dla n= '||n||': '||vWynik);
+END;        
+========================================================================================================
