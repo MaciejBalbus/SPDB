@@ -1,0 +1,43 @@
+--ZADANIE 01  PLSQL_02_zadania
+
+CREATE OR REPLACE PROCEDURE NowyPracownik
+   (cNazwiskoPracownik IN pracownicy.nazwisko%TYPE,
+    cNazwaZespolu IN zespoly.nazwa%TYPE,
+    cNazwiskoSzef IN pracownicy.nazwisko%TYPE,
+    cPlacaPod IN pracownicy.placa_pod%TYPE,
+    cZatrudniony IN  pracownicy.zatrudniony%TYPE DEFAULT CURRENT_DATE,
+    cEtat IN  pracownicy.etat%TYPE DEFAULT 'STAZYSTA') IS
+
+BEGIN
+    INSERT INTO PRACOWNICY 
+        (    ID_PRAC,
+             NAZWISKO,ETAT,ID_SZEFA,ZATRUDNIONY,PLACA_POD,
+             ID_ZESP)
+    VALUES 
+        (   (SELECT max(ID_PRAC)+1 FROM PRACOWNICY),
+            cNazwiskoPracownik,cEtat,(SELECT ID_PRAC FROM PRACOWNICY WHERE NAZWISKO=cNazwiskoSzef),cZatrudniony,cPlacaPod,
+            (SELECT ID_ZESP FROM ZESPOLY  WHERE NAZWA=cNazwaZespolu));  
+END NowyPracownik;
+/
+
+EXEC NowyPracownik('DYNDALSKI','ALGORYTMY','BLAZEWICZ',250);
+
+SELECT * FROM Pracownicy WHERE nazwisko = 'DYNDALSKI';
+
+========================================================================================================
+--ZADANIE 02  PLSQL_02_zadania
+CREATE OR REPLACE FUNCTION PlacaNetto
+   (cPlacaPod IN NUMBER,
+    cPodatek IN NUMBER)
+RETURN NUMBER IS
+    vPlacaNetto NUMBER;
+BEGIN
+ vPlacaNetto:= 100*cPlacaPod/(100+cPodatek) ;
+RETURN ROUND(vPlacaNetto,2);     
+END ;
+/
+
+SELECT nazwisko, placa_pod AS BRUTTO,
+PlacaNetto(placa_pod, 35) AS NETTO
+FROM Pracownicy WHERE etat = 'PROFESOR' ORDER BY nazwisko;
+========================================================================================================
