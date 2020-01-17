@@ -41,3 +41,62 @@ SELECT nazwisko, placa_pod AS BRUTTO,
 PlacaNetto(placa_pod, 35) AS NETTO
 FROM Pracownicy WHERE etat = 'PROFESOR' ORDER BY nazwisko;
 ========================================================================================================
+--ZADANIE 03  PLSQL_02_zadania
+CREATE OR REPLACE FUNCTION Silnia
+    (n IN NUMBER)
+RETURN NUMBER IS
+    vWynik number(20):=1;
+BEGIN
+    IF n<0 THEN
+       RETURN (-1);  -- ZWRACA -1 GDY NIE OTRAFI WYLICZYC SILNI;
+        
+    ELSIF n>0 THEN
+        FOR i IN 1..n LOOP
+             vWynik:= vWynik*i;
+        END LOOP;
+    END IF;
+    RETURN vWynik;
+END;
+/
+
+SELECT Silnia (8) FROM Dual;
+========================================================================================================
+--ZADANIE 04  PLSQL_02_zadania
+CREATE OR REPLACE FUNCTION SilniaRek
+    (n IN NUMBER)
+RETURN NUMBER IS
+    vWynik number(20):=1;
+BEGIN
+--sprawdzenie warunku bledu brak silni z liczby ujemnej zwaca -1
+    IF n<0  THEN
+        RETURN (-1);
+    END IF;      
+
+    IF n=1 THEN
+       RETURN (1);  
+    END IF;    
+
+    RETURN  (n*SilniaRek(n-1));
+END;
+/
+
+SELECT SilniaRek (10) FROM Dual;
+========================================================================================================
+--ZADANIE 05  PLSQL_02_zadania
+CREATE OR REPLACE FUNCTION IleLat
+    (data IN DATE)
+RETURN NUMBER IS
+    vWynik DATE :=CURRENT_DATE;
+BEGIN
+    IF CURRENT_DATE<data THEN  --DETEKCJA BLEDU 
+         RETURN  (-1);
+    END IF;
+
+    RETURN EXTRACT (YEAR FROM (CURRENT_DATE-data) YEAR TO MONTH); 
+END;
+/
+
+SELECT nazwisko, zatrudniony, IleLat(zatrudniony) AS staz
+FROM Pracownicy WHERE placa_pod > 1000
+ORDER BY nazwisko;
+========================================================================================================
