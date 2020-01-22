@@ -28,7 +28,7 @@ SELECT * FROM Pracownicy WHERE nazwisko = 'DYNDALSKI';
 --ZADANIE 02  PLSQL_02_zadania
 CREATE OR REPLACE FUNCTION PlacaNetto
    (cPlacaPod IN NUMBER,
-    cPodatek IN NUMBER)
+    cPodatek IN NUMBER:=20)
 RETURN NUMBER IS
     vPlacaNetto NUMBER;
 BEGIN
@@ -99,3 +99,123 @@ SELECT nazwisko, zatrudniony, IleLat(zatrudniony) AS staz
 FROM Pracownicy WHERE placa_pod > 1000
 ORDER BY nazwisko;
 ========================================================================================================
+--ZADANIE 06  PLSQL_02_zadania
+CREATE OR REPLACE PACKAGE Konwersja IS
+    FUNCTION Cels_To_Fahr(cTemKonwert NUMBER)
+            RETURN NUMBER;
+    FUNCTION Fahr_To_Cels(cTemKonwert NUMBER)
+            RETURN NUMBER;    
+END Konwersja;
+/
+
+CREATE OR REPLACE PACKAGE BODY Konwersja IS
+
+    FUNCTION Cels_To_Fahr(cTemKonwert NUMBER)
+        RETURN NUMBER IS
+        BEGIN
+            RETURN (9/5)*cTemKonwert+32;
+        END;
+    
+    FUNCTION Fahr_To_Cels(cTemKonwert NUMBER)
+        RETURN NUMBER IS
+        BEGIN
+            RETURN (5/9)*(cTemKonwert-32);
+        END;
+
+END Konwersja;
+/
+
+SELECT Konwersja.Fahr_To_Cels(212) AS CELSJUSZ FROM Dual;
+
+SELECT Konwersja.Cels_To_Fahr(0) AS FAHRENHEIT FROM Dual;
+========================================================================================================
+--ZADANIE 07  PLSQL_02_zadania
+CREATE OR REPLACE PACKAGE Zmienne IS
+    PROCEDURE ZwiekszLicznik;
+    PROCEDURE ZmniejszLicznik;
+    FUNCTION  PokazLicznik
+        RETURN NUMBER;
+END Zmienne;
+/
+
+CREATE OR REPLACE PACKAGE BODY Zmienne IS
+    vLicznik NUMBER:=0;
+    
+     PROCEDURE ZwiekszLicznik IS
+        BEGIN
+            vLicznik:= vLicznik+1;
+        END;
+    
+    PROCEDURE ZmniejszLicznik IS
+        BEGIN
+            vLicznik:= vLicznik-1;
+        END;   
+    
+    FUNCTION  PokazLicznik
+    RETURN NUMBER IS       
+        BEGIN            
+            RETURN  vLicznik;
+        END;  
+END Zmienne;
+/
+
+BEGIN
+    dbms_output.put_line(Zmienne.PokazLicznik);
+    
+    Zmienne.ZwiekszLicznik;
+    DBMS_OUTPUT.PUT_LINE(Zmienne.PokazLicznik);
+    Zmienne.ZwiekszLicznik;
+    
+    DBMS_OUTPUT.PUT_LINE (Zmienne.PokazLicznik);
+    Zmienne.ZmniejszLicznik;
+    DBMS_OUTPUT.PUT_LINE (Zmienne.PokazLicznik);
+   
+END;
+========================================================================================================
+--ZADANIE 08  PLSQL_02_zadania
+CREATE OR REPLACE PACKAGE IntZespoly IS
+    PROCEDURE Add_Zespol (cNazwa VARCHAR2,cAdres VARCHAR2); 
+    PROCEDURE Subtract_Zespol_ID (cId_zesp number);
+    PROCEDURE Subtract_Zespol_NAZWA (cNazwa_zesp VARCHAR2);
+    PROCEDURE Change_Zespol (cId_Zesp number, cNew_Name VARCHAR2, cNew_Address VARCHAR2);
+    FUNCTION Get_Id_Zespolu (cNazwa VARCHAR2) RETURN NUMBER;
+END IntZespoly;
+/
+
+CREATE OR REPLACE PACKAGE BODY IntZespoly IS
+    PROCEDURE Add_Zespol (cNazwa VARCHAR2,cAdres VARCHAR2) IS
+        BEGIN
+            INSERT INTO ZESPOLY VALUES((SELECT MAX(ID_ZESP)+1 FROM zespoly),cNazwa,cAdres);
+        END;
+        
+     PROCEDURE Subtract_Zespol_id (cId_zesp number) IS
+        BEGIN 
+            DELETE FROM ZESPOLY WHERE ID_ZESP=cId_zesp;
+        END;
+        
+    PROCEDURE Subtract_Zespol_NAZWA (cNazwa_zesp VARCHAR2)IS
+        BEGIN
+            DELETE FROM ZESPOLY WHERE NAZWA=cNazwa_zesp;
+        END;
+
+    PROCEDURE Change_Zespol (cId_Zesp number, cNew_Name VARCHAR2, cNew_Address VARCHAR2) IS
+        BEGIN
+            UPDATE ZESPOLY
+            SET NAZWA = cNew_Name,
+                ADRES= cNew_Address
+            WHERE ID_ZESP =cId_Zesp ;            
+        END;
+    
+    FUNCTION Get_Id_Zespolu (cNazwa VARCHAR2) RETURN NUMBER IS
+        vWynik Number:=0;
+        BEGIN
+            SELECT ID_ZESP into vWynik FROM ZESPOLY WHERE NAZWA= cNazwa;
+            RETURN coalesce(vWynik,-1);
+        END;
+        
+        
+END IntZespoly;
+/
+========================================================================================================
+
+
