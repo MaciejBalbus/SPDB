@@ -178,7 +178,10 @@ CREATE OR REPLACE PACKAGE IntZespoly IS
     PROCEDURE Subtract_Zespol_ID (cId_zesp number);
     PROCEDURE Subtract_Zespol_NAZWA (cNazwa_zesp VARCHAR2);
     PROCEDURE Change_Zespol (cId_Zesp number, cNew_Name VARCHAR2, cNew_Address VARCHAR2);
-    FUNCTION Get_Id_Zespolu (cNazwa VARCHAR2) RETURN NUMBER;
+    FUNCTION Get_Id_Zespolu_By_Nazwa (cNazwa VARCHAR2) RETURN NUMBER;
+    FUNCTION Get_Nazwa_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2;
+    FUNCTION Get_Address_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2;
+    
 END IntZespoly;
 /
 
@@ -206,16 +209,49 @@ CREATE OR REPLACE PACKAGE BODY IntZespoly IS
             WHERE ID_ZESP =cId_Zesp ;            
         END;
     
-    FUNCTION Get_Id_Zespolu (cNazwa VARCHAR2) RETURN NUMBER IS
+    FUNCTION Get_Id_Zespolu_By_Nazwa  (cNazwa VARCHAR2) RETURN NUMBER IS
         vWynik Number:=0;
         BEGIN
             SELECT ID_ZESP into vWynik FROM ZESPOLY WHERE NAZWA= cNazwa;
             RETURN coalesce(vWynik,-1);
         END;
         
+    FUNCTION Get_Nazwa_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2 IS
+        vWynik Zespoly.nazwa%TYPE :='';
+        BEGIN
+            SELECT NAZWA into vWynik FROM ZESPOLY WHERE ID_ZESP= cId_Zespolu;
+            RETURN COALESCE(vWynik,'-1');
+        END;
         
+    FUNCTION Get_Address_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2 IS
+        vWynik zespoly.adres%TYPE :='';
+        BEGIN
+            SELECT ADRES into vWynik FROM ZESPOLY WHERE ID_ZESP= cId_Zespolu;
+            RETURN COALESCE(vWynik,'-1');
+        END;
+     
 END IntZespoly;
 /
 ========================================================================================================
+
+--ZADANIE 09  PLSQL_02_zadania
+
+SELECT object_name AS "PROCEDURY",
+       STATUS
+FROM User_Objects 
+WHERE object_type = 'PROCEDURE'
+ORDER BY object_name;
+
+SELECT object_name AS "FUNKCJE",
+       STATUS 
+FROM User_Objects 
+WHERE object_type = 'FUNCTION'
+ORDER BY object_name;
+
+SELECT object_name AS "PAKIETY",
+       STATUS
+FROM User_Objects 
+WHERE object_type = 'PACKAGE'
+ORDER BY object_name;
 
 
