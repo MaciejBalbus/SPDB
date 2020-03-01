@@ -1,0 +1,404 @@
+--ZADANIE 01  PLSQL_03_zadania
+
+DECLARE
+    CURSOR cPracownicy IS
+    SELECT 
+        NAZWISKO,
+        ZATRUDNIONY
+    FROM 
+        PRACOWNICY
+    WHERE
+        ETAT ='ASYSTENT'
+    ORDER BY NAZWISKO;
+
+    vNazwisko PRACOWNICY.NAZWISKO%TYPE;
+    vZatrudniony PRACOWNICY.ZATRUDNIONY%TYPE; 
+
+BEGIN
+
+    OPEN cPracownicy;
+    
+    LOOP
+	FETCH cPracownicy INTO vNazwisko,vZatrudniony;
+    	EXIT WHEN cPracownicy%NOTFOUND;
+    	DBMS_OUTPUT.PUT_LINE(vNazwisko|| ' pracuje od '|| TO_CHAR(vZatrudniony,'dd-mm-yyyy'));
+    END LOOP;
+    
+    CLOSE cPracownicy;
+END;
+========================================================================================================
+--ZADANIE 02  PLSQL_03_zadania
+DECLARE
+    CURSOR cPracownicy IS
+    SELECT 
+        NAZWISKO     
+    FROM 
+        PRACOWNICY
+    ORDER BY 
+        placa_pod DESC;
+
+    vNazwisko PRACOWNICY.NAZWISKO%TYPE;
+BEGIN
+
+    OPEN cPracownicy;
+    
+    LOOP
+	FETCH cPracownicy INTO vNazwisko;
+    	EXIT WHEN cPracownicy%NOTFOUND;
+        EXIT WHEN (cPracownicy%ROWCOUNT >3);
+    	DBMS_OUTPUT.PUT_LINE(cPracownicy%ROWCOUNT|| ' : ' || vNazwisko );
+    END LOOP;
+    
+    CLOSE cPracownicy;
+END;
+========================================================================================================
+--ZADANIE 03  PLSQL_03_zadania
+    SELECT 
+        NAZWISKO,
+        PLACA_POD
+    FROM 
+        PRACOWNICY
+    WHERE
+        TO_CHAR(ZATRUDNIONY,'d')=1    
+    ORDER BY NAZWISKO;
+/
+
+DECLARE
+    CURSOR cPODWYZKA IS
+    SELECT 
+        'Nic nie powiem'
+    FROM 
+        PRACOWNICY
+    WHERE
+        TO_CHAR(ZATRUDNIONY,'d')=1    
+    FOR UPDATE;
+
+BEGIN
+    FOR vrNazwisko IN cPODWYZKA LOOP
+    
+        UPDATE PRACOWNICY
+        SET placa_pod = placa_pod*1.2
+        WHERE CURRENT OF cPODWYZKA;
+    END LOOP;
+END;
+/
+    SELECT 
+        NAZWISKO,
+        PLACA_POD
+    FROM 
+        PRACOWNICY
+    WHERE
+        TO_CHAR(ZATRUDNIONY,'d')=1    
+    ORDER BY NAZWISKO;
+/
+========================================================================================================
+--ZADANIE 04  PLSQL_03_zadania
+SELECT
+    *
+FROM
+    PRACOWNICY
+ORDER BY
+    NAZWISKO;
+/
+
+DECLARE
+    CURSOR cPRACOWNICY IS
+    SELECT
+        *
+    FROM
+        PRACOWNICY join ZESPOLY using(id_zesp)
+    ORDER BY
+        NAZWISKO
+    FOR UPDATE;
+
+BEGIN         
+    FOR vrPRACOWNICY    IN cPRACOWNICY LOOP
+        
+        IF vrPRACOWNICY.NAZWA ='ALGORYTMY'  THEN
+            UPDATE PRACOWNICY
+            SET PLACA_DOD = COALESCE(PLACA_DOD,0)+100
+            WHERE CURRENT OF cPRACOWNICY;
+        
+        ELSIF vrPRACOWNICY.NAZWA ='ADMINISTRACJA'  THEN
+            UPDATE PRACOWNICY
+            SET PLACA_DOD = COALESCE(PLACA_DOD,0)+150
+            WHERE CURRENT OF cPRACOWNICY;
+        
+        ELSIF vrPRACOWNICY.ETAT ='STAZYSTA'  THEN
+            DELETE FROM PRACOWNICY
+            WHERE CURRENT OF cPRACOWNICY;
+        END IF;
+        
+    END LOOP;
+    
+END;
+
+/
+
+SELECT
+    *
+FROM
+    PRACOWNICY
+ORDER BY
+    NAZWISKO;
+/
+========================================================================================================
+--ZADANIE 05  PLSQL_03_zadania
+CREATE OR REPLACE PROCEDURE PokazPracownikowEtatu
+    (conEtat IN PRACOWNICY.ETAT%TYPE) IS
+
+    CURSOR C_PracownicyEtatu IS
+        SELECT
+            *
+        FROM
+            PRACOWNICY
+        WHERE
+            PRACOWNICY.ETAT = conEtat
+        ORDER BY
+            NAZWISKO;
+BEGIN
+    FOR vrPRACOWNICY    IN  C_PracownicyEtatu   LOOP
+        DBMS_OUTPUT.PUT_LINE(vrPRACOWNICY.NAZWISKO );    
+    END LOOP;
+END;
+
+/
+
+EXEC PokazPracownikowEtatu('PROFESOR');
+========================================================================================================
+--ZADANIE 06  PLSQL_03_zadania
+
+CREATE OR REPLACE PROCEDURE RaportKadrowy IS
+
+    CURSOR C_Etaty IS
+        SELECT
+            *
+        FROM
+            ETATY
+        ORDER BY
+            NAZWA;
+            
+    CURSOR C_PRACOWNICY(c_NazwaEtatu ETATY.NAZWA%TYPE) IS
+        SELECT
+            *
+        FROM
+            PRACOWNICY
+        WHERE
+            PRACOWNICY.ETAT = c_NazwaEtatu
+        ORDER BY
+            NAZWISKO;
+    
+    vLiczbaPracownikow NUMBER;
+    vSumaPensji NUMBER;
+            
+            
+BEGIN
+    FOR vrC_Etaty  IN C_Etaty LOOP
+    
+        vLiczbaPracownikow:=0;
+        vSumaPensji:=0;
+        DBMS_OUTPUT.PUT_LINE('Etat: '||  vrC_Etaty.NAZWA);
+        DBMS_OUTPUT.PUT_LINE('--------------------' ); 
+        
+        FOR vrC_PRACOWNICY IN C_PRACOWNICY(vrC_Etaty.NAZWA) LOOP
+            
+            DBMS_OUTPUT.PUT_LINE(C_PRACOWNICY%ROWCOUNT||' '||vrC_PRACOWNICY.NAZWISKO ||' pensja: '|| 
+            (vrC_PRACOWNICY.PLACA_POD +COALESCE(vrC_PRACOWNICY.PLACA_DOD,0)));
+            vSumaPensji:= vSumaPensji+ (vrC_PRACOWNICY.PLACA_POD +COALESCE(vrC_PRACOWNICY.PLACA_DOD,0));
+            vLiczbaPracownikow:=vLiczbaPracownikow+1;
+
+        END LOOP;
+        
+        
+        DBMS_OUTPUT.PUT_LINE('Liczba pracowników: '||vLiczbaPracownikow );
+        
+        IF  vLiczbaPracownikow=0  THEN
+            DBMS_OUTPUT.PUT_LINE('Średnia pensja: BRAK');
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Średnia pensja: '||vSumaPensji/vLiczbaPracownikow);
+        END IF;
+        
+        DBMS_OUTPUT.PUT_LINE(' ');
+         
+    END LOOP;
+
+END;
+
+/
+
+EXEC RaportKadrowy;
+========================================================================================================
+--ZADANIE 07  PLSQL_03_zadania
+CREATE OR REPLACE PACKAGE IntZespoly IS
+    PROCEDURE Add_Zespol (cNazwa VARCHAR2,cAdres VARCHAR2); 
+    PROCEDURE Subtract_Zespol_ID (cId_zesp number);
+    PROCEDURE Subtract_Zespol_NAZWA (cNazwa_zesp VARCHAR2);
+    PROCEDURE Change_Zespol (cId_Zesp number, cNew_Name VARCHAR2, cNew_Address VARCHAR2);
+    FUNCTION Get_Id_Zespolu_By_Nazwa (cNazwa VARCHAR2) RETURN NUMBER;
+    FUNCTION Get_Nazwa_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2;
+    FUNCTION Get_Address_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2;
+    
+END IntZespoly;
+/
+
+CREATE OR REPLACE PACKAGE BODY IntZespoly IS
+    PROCEDURE TestOperacji IS
+        BEGIN
+            IF SQL%FOUND=true   THEN
+                DBMS_OUTPUT.PUT_LINE('Operacja zakączona powodzenem');
+            ELSE
+                DBMS_OUTPUT.PUT_LINE('Operacja zakączyła się kompletną porażką');
+            END IF;
+        END;
+
+    PROCEDURE Add_Zespol (cNazwa VARCHAR2,cAdres VARCHAR2) IS
+        BEGIN
+            INSERT INTO ZESPOLY VALUES((SELECT MAX(ID_ZESP)+1 FROM zespoly),cNazwa,cAdres);
+            TestOperacji();
+        END;
+        
+     PROCEDURE Subtract_Zespol_id (cId_zesp number) IS
+        BEGIN 
+            DELETE FROM ZESPOLY WHERE ID_ZESP=cId_zesp;
+            TestOperacji();
+        END;
+        
+    PROCEDURE Subtract_Zespol_NAZWA (cNazwa_zesp VARCHAR2)IS
+        BEGIN
+            DELETE FROM ZESPOLY WHERE NAZWA=cNazwa_zesp;
+            TestOperacji();
+        END;
+
+    PROCEDURE Change_Zespol (cId_Zesp number, cNew_Name VARCHAR2, cNew_Address VARCHAR2) IS
+        BEGIN
+            UPDATE ZESPOLY
+            SET NAZWA = cNew_Name,
+                ADRES= cNew_Address
+            WHERE ID_ZESP =cId_Zesp ;  
+            TestOperacji();
+        END;
+    
+    FUNCTION Get_Id_Zespolu_By_Nazwa  (cNazwa VARCHAR2) RETURN NUMBER IS
+        vWynik Number:=0;
+        BEGIN
+            SELECT ID_ZESP into vWynik FROM ZESPOLY WHERE NAZWA= cNazwa;
+            TestOperacji();
+            RETURN coalesce(vWynik,-1);
+        END;
+        
+    FUNCTION Get_Nazwa_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2 IS
+        vWynik Zespoly.nazwa%TYPE :='';
+        BEGIN
+            SELECT NAZWA into vWynik FROM ZESPOLY WHERE ID_ZESP= cId_Zespolu;
+            TestOperacji();
+            RETURN COALESCE(vWynik,'-1');
+        END;
+        
+    FUNCTION Get_Address_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2 IS
+        vWynik zespoly.adres%TYPE :='';
+        BEGIN
+            SELECT ADRES into vWynik FROM ZESPOLY WHERE ID_ZESP= cId_Zespolu;
+            TestOperacji();
+            RETURN COALESCE(vWynik,'-1');
+        END;
+     
+END IntZespoly;
+/
+EXEC IntZespoly.Add_Zespol('Kosmici','Mars 42');
+EXEC IntZespoly.Subtract_Zespol_NAZWA('Miski'); 
+EXEC IntZespoly.Subtract_Zespol_NAZWA('Kosmici'); 
+
+========================================================================================================
+--ZADANIE 08  PLSQL_03_zadania  
+create or replace PACKAGE IntZespoly IS
+    PROCEDURE Add_Zespol (cNazwa VARCHAR2,cAdres VARCHAR2); 
+    PROCEDURE Subtract_Zespol_ID (cId_zesp number);
+    PROCEDURE Subtract_Zespol_NAZWA (cNazwa_zesp VARCHAR2);
+    PROCEDURE Change_Zespol (cId_Zesp number, cNew_Name VARCHAR2, cNew_Address VARCHAR2);
+    FUNCTION Get_Id_Zespolu_By_Nazwa (cNazwa VARCHAR2) RETURN NUMBER;
+    FUNCTION Get_Nazwa_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2;
+    FUNCTION Get_Address_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2;
+    
+    exZespNazwaNotExist EXCEPTION; 
+
+END IntZespoly;
+/
+create or replace PACKAGE BODY IntZespoly IS
+    exAwaria EXCEPTION;
+    PROCEDURE TestOperacji IS
+         BEGIN
+            IF SQL%FOUND=true   THEN
+                DBMS_OUTPUT.PUT_LINE('Operacja zakączona powodzenem');
+            ELSE
+                DBMS_OUTPUT.PUT_LINE('Operacja zakączyła się kompletną porażką');
+                RAISE exAwaria;
+            END IF;
+        END;
+
+    PROCEDURE Add_Zespol (cNazwa VARCHAR2,cAdres VARCHAR2) IS
+        BEGIN
+            INSERT INTO ZESPOLY VALUES((SELECT MAX(ID_ZESP)+1 FROM zespoly),cNazwa,cAdres);
+            TestOperacji();
+        END Add_Zespol;
+
+     PROCEDURE Subtract_Zespol_id (cId_zesp number) IS
+        BEGIN 
+            DELETE FROM ZESPOLY WHERE ID_ZESP=cId_zesp;
+            TestOperacji();
+        END Subtract_Zespol_id;
+
+    PROCEDURE Subtract_Zespol_NAZWA (cNazwa_zesp VARCHAR2)IS
+        BEGIN
+            DELETE FROM ZESPOLY WHERE NAZWA=cNazwa_zesp;
+            TestOperacji();
+            EXCEPTION
+                WHEN exAwaria THEN RAISE exZespNazwaNotExist;
+        END Subtract_Zespol_NAZWA;
+
+    PROCEDURE Change_Zespol (cId_Zesp number, cNew_Name VARCHAR2, cNew_Address VARCHAR2) IS
+        BEGIN
+            UPDATE ZESPOLY
+            SET NAZWA = cNew_Name,
+                ADRES= cNew_Address
+            WHERE ID_ZESP =cId_Zesp ;  
+            TestOperacji();
+        END;
+
+    FUNCTION Get_Id_Zespolu_By_Nazwa  (cNazwa VARCHAR2) RETURN NUMBER IS
+        vWynik Number:=0;
+        BEGIN
+            SELECT ID_ZESP into vWynik FROM ZESPOLY WHERE NAZWA= cNazwa;
+            EXCEPTION
+                WHEN NO_DATA_FOUND THEN RAISE exZespNazwaNotExist;
+            RETURN vWynik; 
+        END;
+
+    FUNCTION Get_Nazwa_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2 IS
+        vWynik Zespoly.nazwa%TYPE :='';
+        BEGIN
+            SELECT NAZWA into vWynik FROM ZESPOLY WHERE ID_ZESP= cId_Zespolu;
+            TestOperacji();
+            RETURN COALESCE(vWynik,'-1');
+        END;
+
+    FUNCTION Get_Address_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2 IS
+        vWynik zespoly.adres%TYPE :='';
+        BEGIN
+            SELECT ADRES into vWynik FROM ZESPOLY WHERE ID_ZESP= cId_Zespolu;
+            TestOperacji();
+            RETURN COALESCE(vWynik,'-1');
+        END;
+
+END IntZespoly;
+/
+DECLARE
+    vZmienna NUMBER;
+BEGIN
+    vZmienna:=IntZespoly.Get_Id_Zespolu_By_Nazwa('Katapulta');
+EXCEPTION
+    WHEN IntZespoly.exZespNazwaNotExist THEN
+        DBMS_OUTPUT.PUT_LINE('Zapano wyjatek exZespNazwaNotExist ');        
+END;
+
+
+
