@@ -1,0 +1,48 @@
+--ZADANIE 01  PLSQL_04_zadania
+
+--tabela do zapisu 
+CREATE TABLE DziennikOperacji(
+    id_operacji         NUMBER(12) GENERATED ALWAYS AS IDENTITY,
+    czas_operacji       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    operacja            VARCHAR(10),
+    nazwa_tabeli        VARCHAR(30),   
+    liczba_wierszy      NUMBER(12));
+
+--wyzwalacz
+
+create or replace TRIGGER LogujOperacje
+    AFTER INSERT OR DELETE OR UPDATE ON Zespoly
+DECLARE 
+    vOperacja DziennikOperacji.operacja%TYPE;
+    vNazwaTabeli DziennikOperacji.nazwa_tabeli%TYPE:='Zespoly';
+    vLiczbaWierszy  DziennikOperacji.liczba_wierszy%TYPE;    
+BEGIN
+    CASE
+        WHEN INSERTING THEN
+            vOperacja := 'INSERT';
+        WHEN DELETING THEN
+            vOperacja := 'DELETE';
+        WHEN UPDATING THEN
+            vOperacja := 'UPDATE';
+        END CASE;
+        
+        SELECT COUNT(*) INTO vLiczbaWierszy FROM  Zespoly;
+        
+        INSERT  INTO DziennikOperacji
+             VALUES (DEFAULT,DEFAULT,vOperacja,vNazwaTabeli,vLiczbaWierszy);
+        DBMS_OUTPUT.PUT_LINE('Dodano wpis w Dienniku Operacji');
+END;
+
+--Operacje 
+UPDATE ZESPOLY
+SET adres = 'Kombinerki'
+WHERE ID_ZESP =10;
+/
+INSERT INTO ZESPOLY
+VALUES (59,'MISKI','Shire 18');
+/
+DELETE FROM ZESPOLY
+WHERE nazwa='MISKI';
+========================================================================================================
+
+

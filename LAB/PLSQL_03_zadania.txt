@@ -318,7 +318,7 @@ create or replace PACKAGE IntZespoly IS
     FUNCTION Get_Id_Zespolu_By_Nazwa (cNazwa VARCHAR2) RETURN NUMBER;
     FUNCTION Get_Nazwa_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2;
     FUNCTION Get_Address_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2;
-    
+
     exZespNazwaNotExist EXCEPTION; 
 
 END IntZespoly;
@@ -345,6 +345,8 @@ create or replace PACKAGE BODY IntZespoly IS
         BEGIN 
             DELETE FROM ZESPOLY WHERE ID_ZESP=cId_zesp;
             TestOperacji();
+            EXCEPTION
+                WHEN exAwaria THEN RAISE exZespNazwaNotExist;
         END Subtract_Zespol_id;
 
     PROCEDURE Subtract_Zespol_NAZWA (cNazwa_zesp VARCHAR2)IS
@@ -362,7 +364,9 @@ create or replace PACKAGE BODY IntZespoly IS
                 ADRES= cNew_Address
             WHERE ID_ZESP =cId_Zesp ;  
             TestOperacji();
-        END;
+            EXCEPTION
+                WHEN exAwaria THEN RAISE exZespNazwaNotExist;
+        END Change_Zespol;
 
     FUNCTION Get_Id_Zespolu_By_Nazwa  (cNazwa VARCHAR2) RETURN NUMBER IS
         vWynik Number:=0;
@@ -377,16 +381,18 @@ create or replace PACKAGE BODY IntZespoly IS
         vWynik Zespoly.nazwa%TYPE :='';
         BEGIN
             SELECT NAZWA into vWynik FROM ZESPOLY WHERE ID_ZESP= cId_Zespolu;
-            TestOperacji();
-            RETURN COALESCE(vWynik,'-1');
+            EXCEPTION
+                WHEN NO_DATA_FOUND THEN RAISE exZespNazwaNotExist;
+            RETURN vWynik;
         END;
 
     FUNCTION Get_Address_By_Id_Zespolu (cId_Zespolu NUMBER) RETURN VARCHAR2 IS
         vWynik zespoly.adres%TYPE :='';
         BEGIN
             SELECT ADRES into vWynik FROM ZESPOLY WHERE ID_ZESP= cId_Zespolu;
-            TestOperacji();
-            RETURN COALESCE(vWynik,'-1');
+            EXCEPTION
+                WHEN NO_DATA_FOUND THEN RAISE exZespNazwaNotExist;
+            RETURN vWynik;
         END;
 
 END IntZespoly;
@@ -400,5 +406,29 @@ EXCEPTION
         DBMS_OUTPUT.PUT_LINE('Zapano wyjatek exZespNazwaNotExist ');        
 END;
 
+/
+
+BEGIN
+    IntZespoly.Subtract_Zespol_NAZWA('Katapulta');
+EXCEPTION
+    WHEN IntZespoly.exZespNazwaNotExist THEN
+        DBMS_OUTPUT.PUT_LINE('Zapano wyjatek exZespNazwaNotExist ');        
+END;
+/
+
+BEGIN
+    IntZespoly.Subtract_Zespol_id(1987);
+EXCEPTION
+    WHEN IntZespoly.exZespNazwaNotExist THEN
+        DBMS_OUTPUT.PUT_LINE('Zapano wyjatek exZespNazwaNotExist ');        
+END;
+/
+
+BEGIN
+    IntZespoly.Change_Zespol(1987,'Valarzy','Arda 52');
+EXCEPTION
+    WHEN IntZespoly.exZespNazwaNotExist THEN
+        DBMS_OUTPUT.PUT_LINE('Zapano wyjatek exZespNazwaNotExist ');        
+END;
 
 
