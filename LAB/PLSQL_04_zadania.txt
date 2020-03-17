@@ -44,5 +44,37 @@ VALUES (59,'MISKI','Shire 18');
 DELETE FROM ZESPOLY
 WHERE nazwa='MISKI';
 ========================================================================================================
-
-
+--ZADANIE 02  PLSQL_04_zadania
+--nie działa przy zmianie z NULL na 0(warunek widzi NULL jako 0 oraz zadziała wtedy TRIGGER  WymuszajPlace) 
+create or replace TRIGGER PokazPlace
+    BEFORE UPDATE OF placa_pod ON Pracownicy
+    FOR EACH ROW
+    when (coalesce(OLD.placa_pod,0)<>coalesce(NEW.placa_pod,0))
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Pracownik ' || :OLD.nazwisko);
+    DBMS_OUTPUT.PUT_LINE('Płaca przed modyfikacją: ' || :OLD.placa_pod);
+    DBMS_OUTPUT.PUT_LINE('Płaca po modyfikacji: ' || :NEW.placa_pod);
+END;
+========================================================================================================
+--ZADANIE 03  PLSQL_04_zadania
+create or replace TRIGGER  UzupelnijPlace
+    BEFORE INSERT ON Pracownicy
+    FOR EACH ROW
+    WHEN (NEW.placa_pod IS NULL OR NEW.placa_dod IS NULL)
+DECLARE
+    vPlacaPod pracownicy.placa_pod%TYPE;
+BEGIN
+    IF :NEW.placa_dod IS NULL THEN
+        :NEW.placa_dod:=0;
+    END IF;
+    
+    IF( :NEW.placa_pod IS NULL AND :NEW.ETAT IS NOT NULL) THEN
+        SELECT PLACA_MIN INTO vPlacaPod
+        FROM ETATY
+        WHERE nazwa=:NEW.ETAT;
+        
+        :NEW.placa_pod:=vPlacaPod;        
+    END IF;
+    DBMS_OUTPUT.PUT_LINE('Uzupelniono Place');
+END;
+========================================================================================================
