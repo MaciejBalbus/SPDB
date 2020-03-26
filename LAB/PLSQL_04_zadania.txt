@@ -78,3 +78,89 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Uzupelniono Place');
 END;
 ========================================================================================================
+--ZADANIE 04  PLSQL_04_zadania
+Było ale uciekło
+
+
+========================================================================================================
+--ZADANIE 05  PLSQL_04_zadania
+CREATE OR REPLACE  VIEW SZEFOWIE AS 
+  SELECT
+    SZEF,
+    COUNT(SZEF) AS PRACOWNICY
+FROM
+    (SELECT
+        (SELECT szef.nazwisko from pracownicy szef where prac.id_szefa = szef.id_prac)   AS SZEF
+    FROM
+        pracownicy prac
+    where 
+        id_szefa IS NOT NULL)
+GROUP BY
+    SZEF
+ORDER BY
+    SZEF;
+
+create or replace TRIGGER KasujSzefa
+    INSTEAD OF DELETE  ON Szefowie
+    FOR EACH ROW
+DECLARE
+    v_idSzefa pracownicy.id_szefa%TYPE;
+    v_flagaSzefa pracownicy.id_szefa%TYPE:=0;
+    CURSOR cPRACOWNICY (vid_szefa pracownicy.id_szefa%TYPE) IS
+        SELECT
+            *
+        FROM
+            PRACOWNICY PRAC 
+        WHERE 
+            PRAC.id_szefa=v_idszefa
+    FOR UPDATE;
+BEGIN
+    SELECT  id_prac INTO v_idSzefa
+    FROM    pracownicy
+    where nazwisko =:old.szef;
+     
+    FOR vrcPRACOWNICY IN cPRACOWNICY(v_idSzefa) LOOP
+    
+        BEGIN
+            SELECT id_szefa INTO  v_flagaSzefa FROM pracownicy WHERE id_szefa = vrcPRACOWNICY.ID_PRAC GROUP BY id_szefa;   
+
+            RAISE_APPLICATION_ERROR(-20001,'Jeden z podwladnych usuwanego praconika jest szefem innych pracownikow');
+            EXCEPTION
+                WHEN NO_DATA_FOUND THEN
+                    DELETE FROM PRACOWNICY
+                    WHERE CURRENT OF cPRACOWNICY;
+         END;
+         
+    END LOOP;
+    
+    DELETE FROM PRACOWNICY WHERE NAZWISKO = :old.szef;  
+    
+END;
+
+
+SELECT * from szefowie;
+
+DELETE FROM szefowie WHERE  szef='MORZY';
+
+
+SELECT
+    *
+FROM
+    pracownicy
+where
+    id_prac=140 or id_szefa=140;
+
+
+========================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
