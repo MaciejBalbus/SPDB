@@ -79,8 +79,17 @@ BEGIN
 END;
 ========================================================================================================
 --ZADANIE 04  PLSQL_04_zadania
-Było ale uciekło
+CREATE SEQUENCE SEQ_ZESPOLY  INCREMENT BY 1 START WITH 91; 
 
+create or replace TRIGGER UzupelnijID 
+    BEFORE INSERT ON ZESPOLY
+    FOR EACH ROW
+DECLARE
+    vIdZespolu zespoly.id_zesp%TYPE;
+BEGIN
+    :NEW.ID_ZESP:=SEQ_Zespoly.NEXTVAL;
+    DBMS_OUTPUT.PUT_LINE('UzupelnijID ');
+END;
 
 ========================================================================================================
 --ZADANIE 05  PLSQL_04_zadania
